@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>ドローン飛行記録</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>ドローン飛行記録</h1>
+        <form>
+            <div class="input-group">
+                <label for="flight-date">飛行年月日:</label>
+                <input type="date" id="flight-date">
+            </div>
+            <div class="input-group">
+                <label for="pilot-name">操縦者:</label>
+                <input type="text" id="pilot-name" placeholder="操縦者の名前を入力">
+            </div>
+        </form>
+
+        <div class="timer">
+            <div class="timer-button">
+                <button id="start-takeoff">離陸 スタート</button>
+                <button id="stop-landing" disabled>着陸 ストップ</button>
+            </div>
+            <span id="flight-time">00:00:00</span>
+        </div>          
+
+        <div class="timer">
+            <label for="total-flight-time">総飛行時間:</label>
+            <span id="total-flight-time">00:00:00</span>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="coordinates">
+            <label>離陸地座標:</label>
+            <span id="takeoff-coordinates">緯度:--, 経度:--</span>
+        </div>
+        <div class="coordinates">
+            <label>着陸地座標:</label>
+            <span id="landing-coordinates">緯度:--, 経度:--</span>
+        </div>
+
+        <div class="button-container">
+            <button id="save-record">記録を保存</button>
+            <button id="export-csv">CSVに出力</button>
+        </div>
+        
+
+        {% comment %} <div class="input-group">
+            <button id="save-record" onclick="saveRecord()">記録を保存</button>
+        </div>
+
+        <div class="input-group">
+            <button id="export-csv" onclick="exportCSV()">CSVに出力</button>
+        </div> {% endcomment %}
+    </div>
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAzaqhU7tFCZQu6qYxgjoZcZYH3NPFFFus&callback=initMap" async defer></script>
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+
+</html>

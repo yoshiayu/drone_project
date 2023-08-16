@@ -1,0 +1,142 @@
+.container {
+    max-width: 100%;
+    width: 90%; /* コンテナの横幅を90%に変更 */
+    margin: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-group button, 
+.timer button, 
+#save-record, 
+#export-csv {
+    width: 50%; /* ボタンの横幅を50%に変更 */
+    margin: auto;
+    font-size: 1.1em;
+    padding: 10px 20px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap; /* 文字が上下に分かれないように設定 */
+}
+
+.timer .timer-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.timer button {
+    margin: 0 20px; /* 左右に20pxのマージンを設定 */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-image: url('/static/images/image.png');
+    background-size: cover;
+    background-position: center;
+    font-family: 'Arial', sans-serif;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.input-group label, .coordinates label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.input-group input {
+    width: 80%;
+    font-size: 1.1em;
+    padding: 8px;
+    margin: auto;
+    display: block;
+}
+
+.input-group input, .timer span {
+    width: 90%;
+    font-size: 1.2rem;
+    margin: auto;
+    display: block;
+}
+
+.timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.timer button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed; /* 無効なボタンにはnot-allowedカーソルを表示 */
+}
+
+#flight-time {
+    margin: 10px;
+    align-self: center;
+    width: 180px;
+    font-size: 3.2em;
+}
+
+#total-flight-time {
+    font-size: 3.2em;
+    width: 180px;
+}
+
+#map {
+    width: 500px;
+    height: 400px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    align-self: center;
+}
+
+.coordinates {
+    font-size: 1.1em;
+    color: #444;
+    text-align: center;
+}
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+#save-record, #export-csv {
+    width: 50%; /* ボタンの横幅を50%に変更 */
+    margin: 10px; /* 両側のボタンに10pxのマージンを設定 */
+    font-size: 1.5em;
+    padding: 10px 20px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap; /* 文字が上下に分かれないように設定 */
+}
+
+button:active, button:focus {
+    outline: none;
+    transform: none;
+}
