@@ -1,6 +1,10 @@
 let flightTimer = null;
 let flightStartTime = null;
 let totalFlightTimeInSeconds = 0;
+let pauseStartTime = null;
+let pausedTime = 0;
+let takeoffMarker = null; // 離陸地点のマーカー
+let landingMarker = null; // 着陸地点のマーカー
 
 // 離陸タイマーをスタートする関数
 function startFlightTimer() {
@@ -12,6 +16,33 @@ function startFlightTimer() {
     // 離陸ボタンを無効にし、着陸ボタンを有効にする
     document.getElementById('start-takeoff').disabled = true;
     document.getElementById('stop-landing').disabled = false;
+}
+// タイマーを一時停止する関数
+function pauseFlightTimer() {
+    if (flightTimer !== null) {
+        clearInterval(flightTimer);
+        
+        // 一時停止した時点での経過時間を記録
+        pauseStartTime = Date.now() - flightStartTime - pausedTime;
+        pausedTime += pauseStartTime;
+
+        // 一時停止ボタンを無効にし、再開ボタンを有効にする
+        document.getElementById('pause-takeoff').disabled = true;
+        document.getElementById('start-takeoff').disabled = false;
+    }
+}
+
+// タイマーを再開する関数
+function resumeFlightTimer() {
+    if (pauseStartTime !== null) {
+        // タイマーを再開
+        flightStartTime = Date.now() - pauseStartTime - pausedTime;
+        flightTimer = setInterval(updateFlightTimer, 1000);
+        
+        // 再開ボタンを無効にし、一時停止ボタンを有効にする
+        document.getElementById('start-takeoff').disabled = true;
+        document.getElementById('pause-takeoff').disabled = false;
+    }
 }
 
 // タイマーを更新する関数
@@ -103,16 +134,16 @@ function exportCSV() {
 }
 
 function initMap() {
-    console.log("initMap is called");
-    var centerCoordinates = { lat: -34.397, lng: 150.644 };
+    // 東京の緯度と経度に設定
+    var centerCoordinates = { lat: 35.6895, lng: 139.6917 };
     var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 8,
+        zoom: 10,  // ズームレベルを10に設定（好みに応じて調整可能）
         center: centerCoordinates
     });
 
     // マーカーを作成します。
     const marker = new google.maps.Marker({
-        position: { lat: 35.6895, lng: 139.6917 },
+        position: centerCoordinates, // マーカーの初期位置も東京に設定
         map: map,
         draggable: true // このオプションを設定すると、マーカーをドラッグできます
     });
@@ -128,4 +159,42 @@ function initMap() {
         const pos = marker.getPosition();
         document.getElementById("takeoff-coordinates").textContent = '緯度: ' + pos.lat() + ', 経度: ' + pos.lng();
     });
+
+    // マップがクリックされた時のイベント
+    map.addListener('click', function(event) {
+        placeMarker(event.latLng, map);
+    });
+    function placeMarker(location, map) {
+        if (takeoffMarker === null) {
+            // 離陸地点のマーカーを設置
+            takeoffMarker = new google.maps.Marker({
+                position: location,
+                map: map,
+                draggable: true
+            });
+            updateCoordinates('takeoff', location);
+            attachMarkerListeners(takeoffMarker, 'takeoff');
+        } else if (landingMarker === null) {
+            // 着陸地点のマーカーを設置
+            landingMarker = new google.maps.Marker({
+                position: location,
+                map: map,
+                draggable: true
+            });
+            updateCoordinates('landing', location);
+            attachMarkerListeners(landingMarker, 'landing');
+        }
+    }
+    
+    function attachMarkerListeners(marker, type) {
+        // マーカーがドラッグされた際に座標を更新
+        marker.addListener('dragend', function() {
+            updateCoordinates(type, marker.getPosition());
+        });
+    }
+    
+    function updateCoordinates(type, location) {
+        // 指定されたタイプの座標を更新
+        document.getElementById(`${type}-coordinates`).textContent = '緯度: ' + location.lat() + ', 経度: ' + location.lng();
+    }
 }

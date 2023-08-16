@@ -1,5 +1,5 @@
 .container {
-    max-width: 100%;
+    max-width: 1200px;
     width: 90%; /* コンテナの横幅を90%に変更 */
     margin: auto;
     padding: 20px;
@@ -35,7 +35,7 @@
 }
 
 .timer button {
-    margin: 0 20px; /* 左右に20pxのマージンを設定 */
+    margin: 0 10px; /* 左右に20pxのマージンを設定 */
 }
 
 body {
@@ -92,6 +92,10 @@ h1 {
     cursor: not-allowed; /* 無効なボタンにはnot-allowedカーソルを表示 */
 }
 
+.timer label {
+    font-size: 1.2em;
+}
+
 #flight-time {
     margin: 10px;
     align-self: center;
@@ -105,11 +109,17 @@ h1 {
 }
 
 #map {
-    width: 500px;
+    width: 100%;
     height: 400px;
     margin-bottom: 20px;
     border-radius: 8px;
     align-self: center;
+}
+
+@media (min-width: 800px) {
+    #map {
+        width: 70%;
+    }
 }
 
 .coordinates {
