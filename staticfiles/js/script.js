@@ -136,64 +136,6 @@ function saveRecord() {
 
 document.getElementById('save-record').addEventListener('click', saveRecord);
 
-// function saveRecord() {
-//     const flightDate = document.getElementById("flight-date").value;
-//     const pilotName = document.getElementById("pilot-name").value;
-//     const takeoffTime = document.getElementById("takeoff-time").value;
-//     const landingTime = document.getElementById("landing-time").value;
-//     const takeoffCoordinates = document.getElementById("takeoff-coordinates").textContent;
-//     const [takeoffLat, takeoffLng] = takeoffCoordinates.split(', ').map(coord => parseFloat(coord));
-//     const landingCoordinates = document.getElementById("landing-coordinates").textContent;
-//     const [landingLat, landingLng] = landingCoordinates.split(', ').map(coord => parseFloat(coord));
-    
-//     // データ整合性の確認
-//     if (!flightDate || !pilotName || !takeoffTime || !landingTime) {
-//         alert('Please fill in all the required fields.');
-//         return;
-//     }
-
-//     const data = {
-//         date: flightDate,
-//         pilot: pilotName,
-//         takeoff_time: takeoffTime,
-//         landing_time: landingTime,
-//         takeoff_location: {lat: takeoffLat, lng: takeoffLng},
-//         landing_location: {lat: landingLat, lng: landingLng}
-//     };
-
-//     const csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
-
-//     fetch('/save_record/', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-CSRFToken': csrfToken
-//         },
-//         body: JSON.stringify(data)
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             return response.json().then(err => {
-//                 throw new Error(`Server response: ${response.status} - ${err.error}`);
-//             });
-//         }
-//         return response.json();
-//     })
-//     .then(json => {
-//         if (json.success) {
-//             alert('Record saved successfully');
-//         } else {
-//             alert('Error saving record: ' + json.error);
-//         }
-//     })
-//     .catch(error => {
-//         console.error('There was a problem with the fetch operation:', error);
-//         alert('There was an error while saving the record. Please try again.');
-//     });
-
-//     console.log('Data sent to server:', data);
-// }
-
 // 総飛行時間を計算して表示する関数
 function updateTotalFlightTime() {
     // 離陸時間と着陸時間から総飛行時間を計算します
@@ -215,8 +157,8 @@ function exportCSV() {
     // フォームのデータを取得
     const flightDate = document.getElementById("flight-date").value;
     const pilotName = document.getElementById("pilot-name").value;
-    const takeoffTime = document.getElementById("takeoff-time").textContent;
-    const landingTime = document.getElementById("landing-time").textContent;
+    const takeoffTime = document.getElementById("takeoff-time").value; // textContentからvalueに変更
+    const landingTime = document.getElementById("landing-time").value; // textContentからvalueに変更
     const totalFlightTime = document.getElementById("total-flight-time").textContent;
     const takeoffCoordinates = document.getElementById("takeoff-coordinates").textContent;
     const landingCoordinates = document.getElementById("landing-coordinates").textContent;
@@ -238,6 +180,7 @@ function exportCSV() {
     a.click();
     document.body.removeChild(a);
 }
+document.getElementById("export-csv").addEventListener("click", exportCSV);
 
 function initMap() {
     // 東京の緯度と経度に設定
