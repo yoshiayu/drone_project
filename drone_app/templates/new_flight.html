@@ -13,7 +13,8 @@
 <body>
     <div class="container">
         <h1>ドローン飛行記録</h1>
-        <form>
+        <form method="post">
+            {% csrf_token %}
             <div class="input-group">
                 <label for="flight-date">飛行年月日:</label>
                 <input type="date" id="flight-date">
@@ -21,6 +22,14 @@
             <div class="input-group">
                 <label for="pilot-name">操縦者:</label>
                 <input type="text" id="pilot-name" placeholder="操縦者の名前を入力">
+            </div>
+            <div class="input-group">
+                <label for="takeoff-time">離陸時刻:</label>
+                <input type="time" id="takeoff-time">
+            </div>
+            <div class="input-group">
+                <label for="landing-time">着陸時刻:</label>
+                <input type="time" id="landing-time">
             </div>
         </form>
 
@@ -30,7 +39,7 @@
                 <button id="stop-landing" disabled>着陸 ストップ</button>
             </div>
             <span id="flight-time">00:00:00</span>
-        </div>          
+        </div>
 
         <div class="timer">
             <label for="total-flight-time">総飛行時間:</label>
@@ -51,18 +60,10 @@
         <div class="button-container">
             <button id="save-record">記録を保存</button>
             <button id="export-csv">CSVに出力</button>
-        </div>
-        
-
-        {% comment %} <div class="input-group">
-            <button id="save-record" onclick="saveRecord()">記録を保存</button>
-        </div>
-
-        <div class="input-group">
-            <button id="export-csv" onclick="exportCSV()">CSVに出力</button>
-        </div> {% endcomment %}
+        </div>        
     </div>
-    
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAzaqhU7tFCZQu6qYxgjoZcZYH3NPFFFus&callback=initMap" async defer></script>
     <script src="{% static 'js/script.js' %}"></script>
 </body>

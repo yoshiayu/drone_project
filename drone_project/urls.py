@@ -20,5 +20,7 @@ from drone_app import views as your_app_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', your_app_views.home, name='home'),
+    path('save_record/', your_app_views.save_record, name='save_record'),
+    path('export_flights_csv/', your_app_views.export_flights_csv, name='export_flights_csv'),
 ]
 

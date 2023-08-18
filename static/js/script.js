@@ -23,8 +23,11 @@ function pauseFlightTimer() {
         clearInterval(flightTimer);
         
         // 一時停止した時点での経過時間を記録
-        pauseStartTime = Date.now() - flightStartTime - pausedTime;
-        pausedTime += pauseStartTime;
+        pauseStartTime = Date.now();
+        pausedTime += pauseStartTime - flightStartTime;
+        // // 一時停止した時点での経過時間を記録
+        // pauseStartTime = Date.now() - flightStartTime - pausedTime;
+        // pausedTime += pauseStartTime;
 
         // 一時停止ボタンを無効にし、再開ボタンを有効にする
         document.getElementById('pause-takeoff').disabled = true;
@@ -42,6 +45,8 @@ function resumeFlightTimer() {
         // 再開ボタンを無効にし、一時停止ボタンを有効にする
         document.getElementById('start-takeoff').disabled = true;
         document.getElementById('pause-takeoff').disabled = false;
+        // reset pauseStartTime
+        pauseStartTime = null;
     }
 }
 
@@ -80,13 +85,114 @@ function stopFlightTimer() {
 
 // イベントリスナーの設定
 document.getElementById('start-takeoff').addEventListener('click', startFlightTimer);
-document.getElementById('stop-landing').addEventListener('click', stopFlightTimer);
 
+document.getElementById('stop-landing').addEventListener('click', stopFlightTimer);
+document.getElementById('save-record').addEventListener('click', saveRecord);
+// document.getElementById('export-csv').addEventListener('click', exportCSV);
+document.getElementById("export-csv").addEventListener("click", function() {
+    console.log('Export CSV button is clicked');
+    window.location.href = '/export_flights_csv/';
+});
+
+// adminに保存処理を実装します
 function saveRecord() {
-    // ここに保存処理を実装します
-    // 例えば、フォームの内容を取得し、データベースやファイルに保存する処理など
-    alert("記録が保存されました");
+    const flightDate = document.getElementById("flight-date").value;
+    const pilotName = document.getElementById("pilot-name").value;
+    const takeoffTime = document.getElementById("takeoff-time").value;
+    const landingTime = document.getElementById("landing-time").value;
+
+    const data = {
+        date: flightDate,
+        pilot: pilotName,
+        takeoff_time: takeoffTime,
+        landing_time: landingTime,
+    };
+    
+    fetch('/save_record/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.getElementsByName("csrfmiddlewaretoken")[0].value
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(json => {
+        if (json.success) {
+            document.getElementById('message').textContent = 'Record saved successfully';
+        } else {
+            document.getElementById('message').textContent = 'There was an error while saving the record. Please try again.';
+        }
+    })
+    .catch(error => {
+        document.getElementById('message').textContent = 'There was an error while saving the record. Please try again.';
+    });
 }
+
+document.getElementById('save-record').addEventListener('click', saveRecord);
+
+// function saveRecord() {
+//     const flightDate = document.getElementById("flight-date").value;
+//     const pilotName = document.getElementById("pilot-name").value;
+//     const takeoffTime = document.getElementById("takeoff-time").value;
+//     const landingTime = document.getElementById("landing-time").value;
+//     const takeoffCoordinates = document.getElementById("takeoff-coordinates").textContent;
+//     const [takeoffLat, takeoffLng] = takeoffCoordinates.split(', ').map(coord => parseFloat(coord));
+//     const landingCoordinates = document.getElementById("landing-coordinates").textContent;
+//     const [landingLat, landingLng] = landingCoordinates.split(', ').map(coord => parseFloat(coord));
+    
+//     // データ整合性の確認
+//     if (!flightDate || !pilotName || !takeoffTime || !landingTime) {
+//         alert('Please fill in all the required fields.');
+//         return;
+//     }
+
+//     const data = {
+//         date: flightDate,
+//         pilot: pilotName,
+//         takeoff_time: takeoffTime,
+//         landing_time: landingTime,
+//         takeoff_location: {lat: takeoffLat, lng: takeoffLng},
+//         landing_location: {lat: landingLat, lng: landingLng}
+//     };
+
+//     const csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+
+//     fetch('/save_record/', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-CSRFToken': csrfToken
+//         },
+//         body: JSON.stringify(data)
+//     })
+//     .then(response => {
+//         if (!response.ok) {
+//             return response.json().then(err => {
+//                 throw new Error(`Server response: ${response.status} - ${err.error}`);
+//             });
+//         }
+//         return response.json();
+//     })
+//     .then(json => {
+//         if (json.success) {
+//             alert('Record saved successfully');
+//         } else {
+//             alert('Error saving record: ' + json.error);
+//         }
+//     })
+//     .catch(error => {
+//         console.error('There was a problem with the fetch operation:', error);
+//         alert('There was an error while saving the record. Please try again.');
+//     });
+
+//     console.log('Data sent to server:', data);
+// }
 
 // 総飛行時間を計算して表示する関数
 function updateTotalFlightTime() {

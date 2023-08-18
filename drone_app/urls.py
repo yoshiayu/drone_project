@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('new_flight/', views.new_flight, name='new_flight'),
-    path('export_csv/', views.export_flights_csv, name='export_csv'),
+    path('export_flights_csv/', views.export_flights_csv, name='export_flights_csv'),
     path('flights/<int:flight_id>/', views.flight_detail, name='flight_detail'),
-    # その他のURL設定
+    path('save_record/', views.save_record, name='save_record'),
 ]
