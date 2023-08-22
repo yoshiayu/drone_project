@@ -14,6 +14,11 @@ class Flight(models.Model):
 
     def flight_duration(self):
         return self.landing_time - self.takeoff_time
+    def flight_summary(self):
+        duration = self.flight_duration()
+        hours, remainder = divmod(duration.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{self.date} - 操縦者: {self.pilot} - 離陸: {self.takeoff_time.time()} - 着陸: {self.landing_time.time()} - 飛行時間: {hours}時間{minutes}分"
 
 class FlightRecord(models.Model):
     date = models.DateField(verbose_name="飛行日")
@@ -29,4 +34,9 @@ class FlightRecord(models.Model):
 
     def flight_duration(self):
         return self.landing_time - self.takeoff_time
+    def flight_summary(self):
+        duration = self.flight_duration()
+        hours, remainder = divmod(duration.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{self.date} - 操縦者: {self.pilot} - 離陸: {self.takeoff_time.time()} - 着陸: {self.landing_time.time()} - 飛行時間: {hours}時間{minutes}分"
     

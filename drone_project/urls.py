@@ -1,26 +1,13 @@
-"""drone_project URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path
 from drone_app import views as your_app_views
+from drone_app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', your_app_views.home, name='home'),
     path('save_record/', your_app_views.save_record, name='save_record'),
     path('export_flights_csv/', your_app_views.export_flights_csv, name='export_flights_csv'),
+    path('export_data_to_excel/', views.export_data_to_excel, name='export_data_to_excel'),
 ]
 

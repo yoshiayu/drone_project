@@ -1,6 +1,6 @@
 .container {
     max-width: 1200px;
-    width: 100%; /* コンテナの横幅を90%に変更 */
+    width: 100%;
     margin: auto;
     padding: 20px;
     box-sizing: border-box;
@@ -43,7 +43,9 @@ h1 {
     color: #333;
     font-size: 2.5rem;
 }
-
+select, #flight-summary {
+    width: 100%;
+}
 .input-group {
     margin-bottom: 20px;
     text-align: center;
@@ -61,6 +63,11 @@ h1 {
 }
 
 .input-group input {
+    border: none;
+    border-bottom: 2px solid #4CAF50;
+    border-radius: 0;
+    outline: none;
+    transition: border-color 0.3s;
     width: 100%;
     padding: .5rem;
     border: 1px solid #ccc;
@@ -73,6 +80,9 @@ h1 {
     font-size: 1.2rem;
     margin: auto;
     display: block;
+}
+.input-group input:focus {
+    border-color: #5AD88F;
 }
 
 .timer {
@@ -98,6 +108,10 @@ h1 {
 .timer label {
     font-size: 1.2em;
 }
+.timer label, .timer span {
+    font-size: 1.2em;
+}
+
 .timer-button {
     display: flex;
     gap: 1rem;
@@ -105,6 +119,12 @@ h1 {
 }
 
 #flight-time {
+    margin: 10px;
+    align-self: center;
+    width: 180px;
+    font-size: 3.2em;
+}
+#flight-time, #total-flight-time {
     margin: 10px;
     align-self: center;
     width: 180px;
@@ -125,26 +145,60 @@ button {
     padding: .75rem 1.5rem;
     font-size: 1rem;
     color: #fff;
-    background-color: #4CAF50;
+    background-color: #4CAF75;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color .3s ease;
 }
-
+button, .input-group button, .timer button, #save-record, #export-csv {
+    width: 50%;
+    margin: auto;
+    font-size: 1.1em;
+    padding: 10px 20px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
 button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
 
 button:hover:not(:disabled) {
-    background-color: #45a049;
+    background-color: #5AD88F;
 }
+button:active, button:focus {
+    outline: none;
+}
+.custom-select {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select select {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+    background-color: #fff;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
 #map {
     width: 100%;
     height: 400px;
     margin-bottom: 20px;
     border-radius: 8px;
+    box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.1);
 }
 
 .coordinates {

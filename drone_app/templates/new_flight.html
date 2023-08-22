@@ -8,6 +8,8 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <title>ドローン飛行記録</title>
+   
+
 </head>
 
 <body>
@@ -24,6 +26,22 @@
                 <input type="text" id="pilot-name" placeholder="操縦者の名前を入力">
             </div>
             <div class="input-group">
+                <label for="flight-summary">飛行概要:</label>
+                <div class="custom-select">
+                    <select id="flight-summary">
+                        <option value="" disabled selected>飛行概要を選択</option>
+                        <option value="空撮">空撮</option>
+                        <option value="インフラ点検">インフラ点検</option>
+                        <option value="設備点検">設備点検</option>
+                        <optgroup label="作業">
+                            <option value="農薬散布">農薬散布</option>
+                            <option value="肥料散布">肥料散布</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="input-group">
                 <label for="takeoff-time">離陸時刻:</label>
                 <input type="time" id="takeoff-time" placeholder="離陸時間 (HH:MM:SS)">
 
@@ -32,11 +50,13 @@
                 <label for="landing-time">着陸時刻:</label>
                 <input type="time" id="landing-time" placeholder="着陸時間 (HH:MM:SS)">
             </div>
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         </form>
 
         <div class="timer">
             <div class="timer-button">
                 <button id="start-takeoff">離陸 スタート</button>
+                <button id="pause-takeoff">一時 停止</button>
                 <button id="stop-landing" disabled>着陸 ストップ</button>
             </div>
             <span id="flight-time">00:00:00</span>
@@ -61,10 +81,14 @@
         <div class="button-container">
             <button id="save-record">記録を保存</button>
             <button id="export-csv">CSVに出力</button>
+            <button id="export-excel">Excelに出力</button>
+            <input type="file" id="existing-excel-file" />
+       
         </div>        
     </div>
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAzaqhU7tFCZQu6qYxgjoZcZYH3NPFFFus&callback=initMap" async defer></script>
     <script src="{% static 'js/script.js' %}"></script>
 </body>

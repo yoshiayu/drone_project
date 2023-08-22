@@ -85,13 +85,28 @@ function stopFlightTimer() {
 
 // イベントリスナーの設定
 document.getElementById('start-takeoff').addEventListener('click', startFlightTimer);
-
 document.getElementById('stop-landing').addEventListener('click', stopFlightTimer);
 document.getElementById('save-record').addEventListener('click', saveRecord);
 // document.getElementById('export-csv').addEventListener('click', exportCSV);
 document.getElementById("export-csv").addEventListener("click", function() {
     console.log('Export CSV button is clicked');
     window.location.href = '/export_flights_csv/';
+});
+document.addEventListener('DOMContentLoaded', (event) => {
+    const exportExcelButton = document.getElementById('export-excel');
+    
+    exportExcelButton.addEventListener('click', () => {
+        window.location.href = '/export_data_to_excel/'; // サーバのエンドポイントにリクエストを送る
+    });
+});
+document.addEventListener('DOMContentLoaded', (event) => {
+    const existingExcelFileInput = document.getElementById("existing-excel-file");
+    
+    if(existingExcelFileInput) {
+        existingExcelFileInput.addEventListener("change", function() {
+            appendDataToExcel(this);
+        });
+    }
 });
 
 // adminに保存処理を実装します
@@ -100,10 +115,13 @@ function saveRecord() {
     const pilotName = document.getElementById("pilot-name").value;
     const takeoffTime = document.getElementById("takeoff-time").value;
     const landingTime = document.getElementById("landing-time").value;
+    const flightSummaryElement = document.getElementById("flight-summary");
+    const flightSummary = flightSummaryElement.options[flightSummaryElement.selectedIndex].text;
 
     const data = {
         date: flightDate,
         pilot: pilotName,
+        summary: flightSummary,
         takeoff_time: takeoffTime,
         landing_time: landingTime,
     };
@@ -134,7 +152,7 @@ function saveRecord() {
     });
 }
 
-document.getElementById('save-record').addEventListener('click', saveRecord);
+
 
 // 総飛行時間を計算して表示する関数
 function updateTotalFlightTime() {
@@ -154,33 +172,47 @@ function stopTimer(type) {
 }
 
 function exportCSV() {
-    // フォームのデータを取得
-    const flightDate = document.getElementById("flight-date").value;
-    const pilotName = document.getElementById("pilot-name").value;
-    const takeoffTime = document.getElementById("takeoff-time").value; // textContentからvalueに変更
-    const landingTime = document.getElementById("landing-time").value; // textContentからvalueに変更
-    const totalFlightTime = document.getElementById("total-flight-time").textContent;
-    const takeoffCoordinates = document.getElementById("takeoff-coordinates").textContent;
-    const landingCoordinates = document.getElementById("landing-coordinates").textContent;
+    try {
+        // フォームのデータを取得
+        const flightDate = document.getElementById("flight-date").value;
+        const pilotName = document.getElementById("pilot-name").value;
+        const flightSummaryElement = document.getElementById("flight-summary");
+        const flightSummary = flightSummaryElement.options[flightSummaryElement.selectedIndex].text;
+        const takeoffTime = document.getElementById("takeoff-time").value; 
+        const landingTime = document.getElementById("landing-time").value; 
+        const totalFlightTime = document.getElementById("total-flight-time").textContent;
+        const takeoffCoordinates = document.getElementById("takeoff-coordinates").textContent;
+        const landingCoordinates = document.getElementById("landing-coordinates").textContent;
 
-    // CSVデータを生成
-    let csvData = "飛行年月日,操縦者,離陸時間,着陸時間,総飛行時間,離陸地座標,着陸地座標\n";
-    csvData += `${flightDate},${pilotName},${takeoffTime},${landingTime},${totalFlightTime},${takeoffCoordinates},${landingCoordinates}\n`;
+        // CSVデータを生成
+        let csvData = "飛行年月日,操縦者,飛行概要,離陸時間,着陸時間,総飛行時間,離陸地座標,着陸地座標\n";
+        csvData += `${flightDate},${pilotName},${flightSummary},${takeoffTime},${landingTime},${totalFlightTime},${takeoffCoordinates},${landingCoordinates}\n`;
+        
+        // UTF-8 BOMを追加
+        const BOM = "\uFEFF";
+        csvData = BOM + csvData; 
 
-    // CSVデータをBlobオブジェクトとして保存
-    const blob = new Blob([csvData], { type: "text/csv" });
+        // CSVデータをBlobオブジェクトとして保存
+        const blob = new Blob([csvData], { type: "text/csv" });
 
-    // Blobオブジェクトをダウンロードリンクとして提供
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.setAttribute("href", url);
-    a.setAttribute("download", "drone_flight_record.csv");
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+        // Blobオブジェクトをダウンロードリンクとして提供
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.setAttribute("href", url);
+        a.setAttribute("download", "drone_flight_record.csv");
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+    } catch (error) {
+        console.error("Error exporting CSV:", error);
+    }
 }
+
+// イベントリスナーの設定
 document.getElementById("export-csv").addEventListener("click", exportCSV);
+
 
 function initMap() {
     // 東京の緯度と経度に設定
@@ -247,3 +279,44 @@ function initMap() {
         document.getElementById(`${type}-coordinates`).textContent = '緯度: ' + location.lat() + ', 経度: ' + location.lng();
     }
 }
+function appendDataToExcel(fileInput) {
+    const reader = new FileReader();
+    const flightSummaryElement = document.getElementById("flight-summary");
+    const flightSummary = flightSummaryElement.options[flightSummaryElement.selectedIndex].text;
+
+    reader.onload = function(e) {
+        const data = e.target.result;
+        const workbook = XLSX.read(data, {type: 'binary'});
+        
+        // シートの取得
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        
+        // 新たに追加するデータ
+        const newRow = [
+            document.getElementById("flight-date").value,
+            document.getElementById("pilot-name").value,
+            flightSummary,
+            document.getElementById("takeoff-time").textContent,
+            document.getElementById("landing-time").textContent,
+            document.getElementById("total-flight-time").textContent,
+            document.getElementById("takeoff-coordinates").textContent,
+            document.getElementById("landing-coordinates").textContent
+        ];
+
+        // シートにデータを追加
+        const lastRow = XLSX.utils.decode_range(sheet['!ref']).e.r + 1;
+        const newRange = XLSX.utils.encode_range({s: {c: 0, r: lastRow}, e: {c: newRow.length - 1, r: lastRow}});
+        XLSX.utils.sheet_add_aoa(sheet, [newRow], {origin: newRange});
+
+        // ファイルの保存
+        XLSX.writeFile(workbook, "updated_flight_data.xlsx");
+    };
+
+    reader.readAsBinaryString(fileInput.files[0]);
+}
+
+document.getElementById("existing-excel-file").addEventListener("change", function() {
+    appendDataToExcel(this);
+});
+

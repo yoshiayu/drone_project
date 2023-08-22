@@ -1,0 +1,10 @@
+{% extends "new_flight.html" %}
+
+{% block content %}
+<h2>飛行サマリー</h2>
+<ul>
+    {% for summary in summaries %}
+    <li>{{ summary }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
