@@ -246,8 +246,7 @@ function initMap() {
         placeMarker(event.latLng, map);
     });
     function placeMarker(location, map) {
-        if (takeoffMarker === null) {
-            // 離陸地点のマーカーを設置
+        if (!takeoffMarker) {
             takeoffMarker = new google.maps.Marker({
                 position: location,
                 map: map,
@@ -255,8 +254,7 @@ function initMap() {
             });
             updateCoordinates('takeoff', location);
             attachMarkerListeners(takeoffMarker, 'takeoff');
-        } else if (landingMarker === null) {
-            // 着陸地点のマーカーを設置
+        } else if (!landingMarker) {
             landingMarker = new google.maps.Marker({
                 position: location,
                 map: map,
@@ -287,29 +285,21 @@ function appendDataToExcel(fileInput) {
     reader.onload = function(e) {
         const data = e.target.result;
         const workbook = XLSX.read(data, {type: 'binary'});
-        
-        // シートの取得
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-        
-        // 新たに追加するデータ
         const newRow = [
             document.getElementById("flight-date").value,
             document.getElementById("pilot-name").value,
             flightSummary,
-            document.getElementById("takeoff-time").textContent,
-            document.getElementById("landing-time").textContent,
+            document.getElementById("takeoff-time").value,
+            document.getElementById("landing-time").value,
             document.getElementById("total-flight-time").textContent,
             document.getElementById("takeoff-coordinates").textContent,
             document.getElementById("landing-coordinates").textContent
         ];
-
-        // シートにデータを追加
         const lastRow = XLSX.utils.decode_range(sheet['!ref']).e.r + 1;
         const newRange = XLSX.utils.encode_range({s: {c: 0, r: lastRow}, e: {c: newRow.length - 1, r: lastRow}});
         XLSX.utils.sheet_add_aoa(sheet, [newRow], {origin: newRange});
-
-        // ファイルの保存
         XLSX.writeFile(workbook, "updated_flight_data.xlsx");
     };
 
@@ -319,26 +309,40 @@ function appendDataToExcel(fileInput) {
 document.getElementById("existing-excel-file").addEventListener("change", function() {
     appendDataToExcel(this);
 });
+
 document.getElementById('export-excel').addEventListener('click', function() {
-    // 既存のExcelファイルを読み込む
+    var 飛行年月日 = document.getElementById('flight-date').value;
+    var 操縦者 = document.getElementById('pilot-name').value;
+    var 飛行概要 = document.getElementById("flight-summary").value;
+    var 離陸時刻 = document.getElementById("takeoff-time").value;
+    console.log('離陸時刻:' + 離陸時刻)
+    var 着陸時刻 = document.getElementById("landing-time").value;
+    console.log('着陸時刻:' + 着陸時刻)
+    var 総飛行時間 = document.getElementById("total-flight-time").textContent;
+    var 離陸座標 = document.getElementById("takeoff-coordinates").textContent;
+    console.log(離陸座標);
+    var 着陸座標 = document.getElementById("landing-coordinates").textContent;
+    console.log(着陸座標);
+
     const oReq = new XMLHttpRequest();
-    oReq.open("GET", "/path/to/飛行日誌.xlsx", true);
+    oReq.open("GET", "/static/飛行日誌.xlsx", true);
     oReq.responseType = "arraybuffer";
 
     oReq.onload = function(e) {
         const arraybuffer = oReq.response;
         const data = new Uint8Array(arraybuffer);
         const workbook = XLSX.read(data, {type: "array"});
-
-        // シート1を取得
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-        // データを指定されたセルに書き込む
-        XLSX.utils.sheet_add_aoa(worksheet, [
-            ['飛行年月日の値', '操縦者の値'],  // 実際の値に置き換える
-        ], {origin: 'セルの位置'});  // 正確なセルの位置に置き換える
+        worksheet[XLSX.utils.encode_cell({r: 5, c: 1})] = { t: "s", v: 飛行年月日 };
+        worksheet[XLSX.utils.encode_cell({r: 5, c: 2})] = { t: "s", v: 操縦者 };
+        worksheet[XLSX.utils.encode_cell({r: 5, c: 3})] = { t: "s", v: 飛行概要 };
+        worksheet[XLSX.utils.encode_cell({r: 5, c: 4})] = { t: "s", v: 離陸座標 };
+        worksheet[XLSX.utils.encode_cell({r: 5, c: 5})] = { t: "s", v: 着陸座標 };
+        worksheet[XLSX.utils.encode_cell({r: 5, c: 6})] = { t: "s", v: 離陸時刻 };
+        worksheet[XLSX.utils.encode_cell({r: 5, c: 7})] = { t: "s", v: 着陸時刻 };
+        worksheet[XLSX.utils.encode_cell({r: 5, c: 9})] = { t: "s", v: 総飛行時間 };
 
-        // 修正したExcelファイルを出力
         XLSX.writeFile(workbook, '飛行日誌_新.xlsx');
     }
 

@@ -79,7 +79,7 @@ def export_flights_csv(request):
     response.write('\ufeff')
 
     writer = csv.writer(response)
-    writer.writerow(['飛行日', '操縦者', '離陸時間', '着陸時間', '離陸地点', '着陸地点'])
+    writer.writerow(['飛行日', '操縦者', '飛行概要', '離陸時間', '着陸時間', '総飛行時間', '離陸座標', '着陸座標'])
 
     for flight in Flight.objects.all():
         writer.writerow([flight.date, flight.pilot, flight.takeoff_time, flight.landing_time, flight.takeoff_location, flight.landing_location])
