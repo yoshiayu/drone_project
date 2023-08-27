@@ -152,8 +152,6 @@ function saveRecord() {
     });
 }
 
-
-
 // 総飛行時間を計算して表示する関数
 function updateTotalFlightTime() {
     // 離陸時間と着陸時間から総飛行時間を計算します
@@ -277,6 +275,7 @@ function initMap() {
         document.getElementById(`${type}-coordinates`).textContent = '緯度: ' + location.lat() + ', 経度: ' + location.lng();
     }
 }
+
 function appendDataToExcel(fileInput) {
     const reader = new FileReader();
     const flightSummaryElement = document.getElementById("flight-summary");
@@ -284,23 +283,38 @@ function appendDataToExcel(fileInput) {
 
     reader.onload = function(e) {
         const data = e.target.result;
-        const workbook = XLSX.read(data, {type: 'binary'});
+        const workbook = XLSX.read(data, {type: 'binary', cellStyles: true});
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
+
         const newRow = [
-            document.getElementById("flight-date").value,
-            document.getElementById("pilot-name").value,
-            flightSummary,
-            document.getElementById("takeoff-time").value,
-            document.getElementById("landing-time").value,
-            document.getElementById("total-flight-time").textContent,
-            document.getElementById("takeoff-coordinates").textContent,
-            document.getElementById("landing-coordinates").textContent
+            [   // 2次元配列に変更
+                document.getElementById("flight-date").value,
+                document.getElementById("pilot-name").value,
+                flightSummary,
+                document.getElementById("takeoff-time").value,
+                document.getElementById("landing-time").value,
+                document.getElementById("total-flight-time").textContent,
+                document.getElementById("takeoff-coordinates").textContent,
+                document.getElementById("landing-coordinates").textContent
+            ]
         ];
-        const lastRow = XLSX.utils.decode_range(sheet['!ref']).e.r + 1;
-        const newRange = XLSX.utils.encode_range({s: {c: 0, r: lastRow}, e: {c: newRow.length - 1, r: lastRow}});
-        XLSX.utils.sheet_add_aoa(sheet, [newRow], {origin: newRange});
-        XLSX.writeFile(workbook, "updated_flight_data.xlsx");
+
+        // 新しい行をシートに追加
+        XLSX.utils.sheet_add_aoa(sheet, newRow, {origin: -1});
+
+        const lastRow = XLSX.utils.decode_range(sheet['!ref']).e.r;
+
+        for(let i = 0; i < newRow[0].length; i++) {
+            const cellRef = XLSX.utils.encode_cell({r: lastRow, c: i});
+            const prevCellRef = XLSX.utils.encode_cell({r: lastRow - 1, c: i});
+            const originalCell = sheet[prevCellRef];
+            if (originalCell && originalCell.s) {
+                sheet[cellRef].s = originalCell.s;
+            }
+        }
+
+        XLSX.writeFile(workbook, "updated_flight_data.xlsx", {cellStyles: true});
     };
 
     reader.readAsBinaryString(fileInput.files[0]);
@@ -310,42 +324,89 @@ document.getElementById("existing-excel-file").addEventListener("change", functi
     appendDataToExcel(this);
 });
 
-document.getElementById('export-excel').addEventListener('click', function() {
+document.getElementById('export-excel').addEventListener('click', function(e) {
+    e.preventDefault();
     var 飛行年月日 = document.getElementById('flight-date').value;
     var 操縦者 = document.getElementById('pilot-name').value;
     var 飛行概要 = document.getElementById("flight-summary").value;
     var 離陸時刻 = document.getElementById("takeoff-time").value;
-    console.log('離陸時刻:' + 離陸時刻)
     var 着陸時刻 = document.getElementById("landing-time").value;
-    console.log('着陸時刻:' + 着陸時刻)
     var 総飛行時間 = document.getElementById("total-flight-time").textContent;
     var 離陸座標 = document.getElementById("takeoff-coordinates").textContent;
-    console.log(離陸座標);
     var 着陸座標 = document.getElementById("landing-coordinates").textContent;
-    console.log(着陸座標);
 
     const oReq = new XMLHttpRequest();
-    oReq.open("GET", "/static/飛行日誌.xlsx", true);
+    oReq.open("GET", "/get_excel/", true);
+    // oReq.open("GET", "/static/飛行日誌.xlsx", true);
     oReq.responseType = "arraybuffer";
 
     oReq.onload = function(e) {
         const arraybuffer = oReq.response;
         const data = new Uint8Array(arraybuffer);
-        const workbook = XLSX.read(data, {type: "array"});
+        const workbook = XLSX.read(data, {type: "array", cellStyles: true});
+        // const workbook = XLSX.read(data, {type: "array"});
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        // 既存のセルの列の幅を保持
+        const originalCols = worksheet['!cols'];
+        const updateCell = (r, c, value) => {
+            const originalCell = worksheet[XLSX.utils.encode_cell({r: r, c: c})];
+            worksheet[XLSX.utils.encode_cell({r: r, c: c})] = { t: "s", v: value, s: originalCell ? originalCell.s : {} };
+        };
+        updateCell(5, 1, 飛行年月日);
+        updateCell(5, 2, 操縦者);
+        updateCell(5, 3, 飛行概要);
+        updateCell(5, 4, 離陸座標);
+        updateCell(5, 5, 着陸座標);
+        updateCell(5, 6, 離陸時刻);
+        updateCell(5, 7, 着陸時刻);
+        updateCell(5, 9, 総飛行時間);
 
-        worksheet[XLSX.utils.encode_cell({r: 5, c: 1})] = { t: "s", v: 飛行年月日 };
-        worksheet[XLSX.utils.encode_cell({r: 5, c: 2})] = { t: "s", v: 操縦者 };
-        worksheet[XLSX.utils.encode_cell({r: 5, c: 3})] = { t: "s", v: 飛行概要 };
-        worksheet[XLSX.utils.encode_cell({r: 5, c: 4})] = { t: "s", v: 離陸座標 };
-        worksheet[XLSX.utils.encode_cell({r: 5, c: 5})] = { t: "s", v: 着陸座標 };
-        worksheet[XLSX.utils.encode_cell({r: 5, c: 6})] = { t: "s", v: 離陸時刻 };
-        worksheet[XLSX.utils.encode_cell({r: 5, c: 7})] = { t: "s", v: 着陸時刻 };
-        worksheet[XLSX.utils.encode_cell({r: 5, c: 9})] = { t: "s", v: 総飛行時間 };
+        // worksheet[XLSX.utils.encode_cell({r: 5, c: 1})] = { t: "s", v: 飛行年月日 };
+        // worksheet[XLSX.utils.encode_cell({r: 5, c: 2})] = { t: "s", v: 操縦者 };
+        // worksheet[XLSX.utils.encode_cell({r: 5, c: 3})] = { t: "s", v: 飛行概要 };
+        // worksheet[XLSX.utils.encode_cell({r: 5, c: 4})] = { t: "s", v: 離陸座標 };
+        // worksheet[XLSX.utils.encode_cell({r: 5, c: 5})] = { t: "s", v: 着陸座標 };
+        // worksheet[XLSX.utils.encode_cell({r: 5, c: 6})] = { t: "s", v: 離陸時刻 };
+        // worksheet[XLSX.utils.encode_cell({r: 5, c: 7})] = { t: "s", v: 着陸時刻 };
+        // worksheet[XLSX.utils.encode_cell({r: 5, c: 9})] = { t: "s", v: 総飛行時間 };
 
-        XLSX.writeFile(workbook, '飛行日誌_新.xlsx');
+        if (originalCols) {
+            worksheet['!cols'] = originalCols;
+        }
+        XLSX.writeFile(workbook, '飛行日誌_新.xlsx', {cellStyles: true});
+        // XLSX.writeFile(workbook, '飛行日誌_新.xlsx');
     }
 
     oReq.send();
 });
 
+
+
+// function appendDataToExcel(fileInput) {
+//     const reader = new FileReader();
+//     const flightSummaryElement = document.getElementById("flight-summary");
+//     const flightSummary = flightSummaryElement.options[flightSummaryElement.selectedIndex].text;
+
+//     reader.onload = function(e) {
+//         const data = e.target.result;
+//         const workbook = XLSX.read(data, {type: 'binary'});
+//         const sheetName = workbook.SheetNames[0];
+//         const sheet = workbook.Sheets[sheetName];
+//         const newRow = [
+//             document.getElementById("flight-date").value,
+//             document.getElementById("pilot-name").value,
+//             flightSummary,
+//             document.getElementById("takeoff-time").value,
+//             document.getElementById("landing-time").value,
+//             document.getElementById("total-flight-time").textContent,
+//             document.getElementById("takeoff-coordinates").textContent,
+//             document.getElementById("landing-coordinates").textContent
+//         ];
+//         const lastRow = XLSX.utils.decode_range(sheet['!ref']).e.r + 1;
+//         const newRange = XLSX.utils.encode_range({s: {c: 0, r: lastRow}, e: {c: newRow.length - 1, r: lastRow}});
+//         XLSX.utils.sheet_add_aoa(sheet, [newRow], {origin: newRange});
+//         XLSX.writeFile(workbook, "updated_flight_data.xlsx");
+//     };
+
+//     reader.readAsBinaryString(fileInput.files[0]);
+// }
