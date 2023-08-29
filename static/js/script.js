@@ -361,15 +361,6 @@ document.getElementById('export-excel').addEventListener('click', function(e) {
         updateCell(5, 7, 着陸時刻);
         updateCell(5, 9, 総飛行時間);
 
-        // worksheet[XLSX.utils.encode_cell({r: 5, c: 1})] = { t: "s", v: 飛行年月日 };
-        // worksheet[XLSX.utils.encode_cell({r: 5, c: 2})] = { t: "s", v: 操縦者 };
-        // worksheet[XLSX.utils.encode_cell({r: 5, c: 3})] = { t: "s", v: 飛行概要 };
-        // worksheet[XLSX.utils.encode_cell({r: 5, c: 4})] = { t: "s", v: 離陸座標 };
-        // worksheet[XLSX.utils.encode_cell({r: 5, c: 5})] = { t: "s", v: 着陸座標 };
-        // worksheet[XLSX.utils.encode_cell({r: 5, c: 6})] = { t: "s", v: 離陸時刻 };
-        // worksheet[XLSX.utils.encode_cell({r: 5, c: 7})] = { t: "s", v: 着陸時刻 };
-        // worksheet[XLSX.utils.encode_cell({r: 5, c: 9})] = { t: "s", v: 総飛行時間 };
-
         if (originalCols) {
             worksheet['!cols'] = originalCols;
         }

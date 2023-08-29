@@ -52,12 +52,14 @@ def export_data_to_excel(request):
     absolute_path = '/Users/yoshiayu/drone_project/static/飛行日誌.xlsx'
     # file_path = '飛行日誌.xlsx'
     try:
-        data = pd.read_excel(absolute_path)
+        data = pd.read_excel(absolute_path, engine='openpyxl')
+
         # data = pd.read_excel(file_path)
         
         # 一時的なファイル名を設定
         temp_file_path = 'temp_飛行日誌.xlsx'
-        data.to_excel(temp_file_path, index=False)
+        data.to_excel(temp_file_path, index=False, engine='openpyxl')
+
         # data.to_excel(file_path, index=False)
         wrapper = FileWrapper(open(temp_file_path, 'rb'))
         response = HttpResponse(wrapper, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -106,10 +108,12 @@ def new_flight(request):
     
 def import_data_from_excel(request):
     file_path = '飛行日誌.xlsx'
-    data = pd.read_excel(file_path)
+    data = pd.read_excel(file_path, engine='openpyxl')
+
     # ... 何らかのデータ操作 ...
     # データ操作が完了したら保存
-    data.to_excel(file_path, index=False)
+    data.to_excel(file_path, index=False, engine='openpyxl')
+
     return JsonResponse({'success': True})
 
 logger = logging.getLogger(__name__)
@@ -124,4 +128,4 @@ def get_excel_file(request):
         return response
     else:
         # ファイルが存在しない場合の処理
-        return JsonResponse({"success": false, "error": "File not found"})
+        return JsonResponse({"success": False, "error": "File not found"})
