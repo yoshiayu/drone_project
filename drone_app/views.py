@@ -16,6 +16,10 @@ import os
 from django.conf import settings
 from django.http import FileResponse
 import logging
+from .models import Maintenance
+
+def maintenance_record(request):
+    return render(request, 'Maintenance_record.html')
 
 def flight_summaries(request):
     flights = Flight.objects.all()
@@ -129,3 +133,40 @@ def get_excel_file(request):
     else:
         # ファイルが存在しない場合の処理
         return JsonResponse({"success": False, "error": "File not found"})
+
+# def maintenance_record(request):
+#     if request.method == 'POST':
+#         # この部分は、formから送信されたデータを取り扱うロジックです。
+#         # ここに具体的な処理を記述する必要があります。
+#         # 例えば、新しいMaintenanceレコードを保存する処理などです。
+#         form = MaintenanceForm(request.POST)
+#         if form.is_valid():
+#              form.save()
+#         return redirect('maintenance_record')
+#         pass
+
+#     else:
+#         try:
+#             last_record = Flight.objects.latest('id')
+#             context = {
+#                 'coordinate_data': last_record.takeoff_location,  # 適切な属性名に変更
+#                 'flight_date': last_record.date,
+#                 'pilot_data': last_record.pilot
+#             }
+#         except Flight.DoesNotExist:
+#             context = {
+#                 'coordinate_data': '',
+#                 'flight_date': '',
+#                 'pilot_data': ''
+#             }
+#         return render(request, 'drone_app/Maintenance_record.html', context)
+
+
+def maintenance_record(request):
+    # 仮のデータをセットします。実際にはデータベースからデータを取得するロジックに置き換える必要があります。
+    context = {
+        'coordinate_data': "座標情報をここに",
+        'flight_date': timezone.now().date(),  # 現在の日付
+        'pilot_data': "操縦者情報をここに",
+    }
+    return render(request, 'Maintenance_record.html', context)

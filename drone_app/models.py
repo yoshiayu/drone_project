@@ -39,4 +39,10 @@ class FlightRecord(models.Model):
         hours, remainder = divmod(duration.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{self.date} - 操縦者: {self.pilot} - 離陸: {self.takeoff_time.time()} - 着陸: {self.landing_time.time()} - 飛行時間: {hours}時間{minutes}分"
+class Maintenance(models.Model):
+    coordinate_data = models.CharField(max_length=255, verbose_name="座標データ")
+    flight_date = models.DateField(verbose_name="飛行日")
+    pilot_data = models.CharField(max_length=100, verbose_name="操縦者")
     
+    def __str__(self):
+        return f"{self.flight_date} - {self.pilot_data}"

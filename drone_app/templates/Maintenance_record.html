@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>メンテナンス記録</title>
+    <style>
+        .maintenance-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .maintenance-table th,
+        .maintenance-table td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>メンテナンス記録</h1>
+
+        <!-- new_flight.htmlに戻るボタン (ヘッダー部) -->
+        <a href="{% url 'new_flight' %}" class="return-button">戻る</a>
+
+        <!-- 点検項目の表 -->
+        <table class="maintenance-table">
+            <thead>
+                <tr>
+                    <th>点検項目</th>
+                    <th>点検内容</th>
+                    <th>結果</th>
+                    <th>備考</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 機体全般の点検項目 -->
+                <tr>
+                    <td><strong>機体全般</strong></td>                
+                    <td>機器の取り付け状態（ネジ、コネクタ、ケーブル等）</td>
+                    <td><input type="checkbox" /></td>
+                    <td><input type="text" placeholder="備考" /></td>
+                </tr>
+                <!-- プロペラの点検項目 -->
+                <tr>
+                    <td><strong>プロペラ</strong></td>                
+                    <td>外観、損傷、ゆがみ</td>
+                    <td><input type="checkbox" /></td>
+                    <td><input type="text" placeholder="備考" /></td>
+                </tr>
+                <tr>
+                    <td><strong>フレーム</strong></td>                
+                    <td>外観、損傷、ゆがみ</td>
+                    <td><input type="checkbox" /></td>
+                    <td><input type="text" placeholder="備考" /></td>
+                </tr>
+                <tr>
+                    <td><strong>通信系統</strong></td>                
+                    <td>機体と操縦装置の通信品質の健全性</td>
+                    <td><input type="checkbox" /></td>
+                    <td><input type="text" placeholder="備考" /></td>
+                </tr>
+                <tr>
+                    <td><strong>推進系統</strong></td>                
+                    <td>モーター又は発動機の健全性</td>
+                    <td><input type="checkbox" /></td>
+                    <td><input type="text" placeholder="備考" /></td>
+                </tr>
+                <tr>
+                    <td><strong>電源系統</strong></td>                
+                    <td>機体又は操縦装置の電源の健全性</td>
+                    <td><input type="checkbox" /></td>
+                    <td><input type="text" placeholder="備考" /></td>
+                </tr>
+                <tr>
+                    <td><strong>自動制御系統</strong></td>                
+                    <td>飛行制御装置の健全性</td>
+                    <td><input type="checkbox" /></td>
+                    <td><input type="text" placeholder="備考" /></td>
+                </tr>
+                <tr>
+                    <td><strong>バッテリー・燃料</strong></td>                
+                    <td>バッテリーの充電状況、残燃料表示機能の健全性</td>
+                    <td><input type="checkbox" /></td>
+                    <td><input type="text" placeholder="備考" /></td>
+                </tr>
+                <tr>
+                    <td><strong>特記事項</strong></td>
+                    <td><input type="text" placeholder="備考" /></td>
+                </tr>
+                    
+
+                
+
+                <!-- 実施情報 -->
+                <tr>
+                    <td><strong>実施場所</strong></td>
+                    <td colspan="2"><a href="{% url 'new_flight' %}">座標リンク</a>{{ coordinate_data }}</td>
+                </tr>
+                <tr>
+                    <td><strong>実施年月日</strong></td>
+                    <td colspan="2"><input type="date" value="{{ flight_date }}" /></td>
+                </tr>
+                <tr>
+                    <td><strong>実施者</strong></td>
+                    <td colspan="2"><a href="{% url 'new_flight' %}">操縦者リンク</a>{{ pilot_data }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="button-container">
+            <button id="save-maintenance">記録を保存</button>
+            <button id="export-maintenance-excel">Excelに出力</button>
+            <input type="file" id="existing-maintenance-excel-file" />
+        </div>
+
+        <!-- new_flight.htmlに戻るボタン (フッター部) -->
+        <a href="{% url 'new_flight' %}" class="return-button">戻る</a>
+
+    </div>
+
+    <script src="{% static 'js/maintenance_script.js' %}"></script>
+</body>
+
+</html>

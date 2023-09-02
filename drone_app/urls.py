@@ -1,8 +1,10 @@
 from django.urls import path
 from . import views
+from .views import maintenance_record
 
 urlpatterns = [
     path('new_flight/', views.new_flight, name='new_flight'),
+    path('maintenance/', maintenance_record, name='maintenance_record'),
     path('export_flights_csv/', views.export_flights_csv, name='export_flights_csv'),
     path('flights/<int:flight_id>/', views.flight_detail, name='flight_detail'),
     path('save_record/', views.save_record, name='save_record'),
