@@ -7,13 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+
     <title>ドローン飛行記録</title>
    
 
 </head>
 <div class="header-nav">
     <a href="{% url 'home' %}">MAIN</a> | 
-    <a href="{% url 'maintenance_record' %}">Mainte</a>
+    <a href="{% url 'maintenance_record' %}">Mainte</a> |
+    {% comment %} <a href="{% url 'I$M_record' %}">I&M record</a> {% endcomment %}
 </div>
 
 <body>
@@ -34,13 +38,20 @@
                 <div class="custom-select">
                     <select id="flight-summary">
                         <option value="" disabled selected>飛行概要を選択</option>
-                        <option value="空撮">空撮</option>
-                        <option value="インフラ点検">インフラ点検</option>
-                        <option value="設備点検">設備点検</option>
-                        <optgroup label="作業">
-                            <option value="農薬散布">農薬散布</option>
-                            <option value="肥料散布">肥料散布</option>
+                        <optgroup label="目視内飛行">
+                        <option value="空撮(目視内)">空撮(目視内)</option>
+                        <option value="インフラ点検(目視内)">インフラ点検(目視内)</option>
+                        <option value="設備点検(目視内)">設備点検(目視内)</option>
+                        <option value="農薬散布(目視内)">農薬散布(目視内)</option>
+                        <option value="肥料散布(目視内)">肥料散布(目視内)</option>
                         </optgroup>
+                        <optgroup label="目視外飛行">
+                            <option value="空撮(目視外)">空撮(目視外)</option>
+                            <option value="インフラ点検(目視外)">インフラ点検(目視外)</option>
+                            <option value="設備点検(目視外)">設備点検(目視外)</option>
+                            <option value="農薬散布(目視外)">農薬散布(目視外)</option>
+                            <option value="肥料散布(目視外)">肥料散布(目視外)</option>
+                            </optgroup>
                     </select>
                 </div>
             </div>

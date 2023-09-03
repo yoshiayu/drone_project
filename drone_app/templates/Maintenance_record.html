@@ -8,17 +8,71 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <title>メンテナンス記録</title>
-    <style>
+    <div class="header-nav">
+        <a href="{% url 'home' %}">MAIN</a> | 
+        <a href="{% url 'maintenance_record' %}">Mainte</a> |
+        {% comment %} <a href="{% url 'I$M_record' %}">I&M record</a> {% endcomment %}
+    </div>
+    <style>       
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('/static/images/image.png');
+            background-size: cover;
+            background-position: center;
+            font-family: 'Dancing Script', cursive;
+            font-size: 20px;
+            color: black;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 1.5);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         .maintenance-table {
             border-collapse: collapse;
             width: 100%;
+            margin-bottom: 30px;
         }
-
         .maintenance-table th,
         .maintenance-table td {
             border: 1px solid black;
             padding: 8px;
             text-align: left;
+        }
+        button, .return-button {
+            padding: 5px 20px;
+            margin-top: 5px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-right: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        button:hover, .return-button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        #existing-maintenance-excel-file {
+            display: none;
+        }
+        @media (min-width: 800px) {
+            #map {
+                width: 90%;
+            }
         }
     </style>
 </head>
@@ -26,10 +80,6 @@
 <body>
     <div class="container">
         <h1>メンテナンス記録</h1>
-
-        <!-- new_flight.htmlに戻るボタン (ヘッダー部) -->
-        <a href="{% url 'new_flight' %}" class="return-button">戻る</a>
-
         <!-- 点検項目の表 -->
         <table class="maintenance-table">
             <thead>
@@ -93,24 +143,20 @@
                 </tr>
                 <tr>
                     <td><strong>特記事項</strong></td>
-                    <td><input type="text" placeholder="備考" /></td>
+                    <td colspan="3"><input type="text" placeholder="備考" /></td>
                 </tr>
-                    
-
-                
-
                 <!-- 実施情報 -->
                 <tr>
                     <td><strong>実施場所</strong></td>
-                    <td colspan="2"><a href="{% url 'new_flight' %}">座標リンク</a>{{ coordinate_data }}</td>
+                    <td colspan="3"><a href="{% url 'new_flight' %}">座標リンク</a>{{ coordinate_data }}</td>
                 </tr>
                 <tr>
                     <td><strong>実施年月日</strong></td>
-                    <td colspan="2"><input type="date" value="{{ flight_date }}" /></td>
+                    <td colspan="3"><input type="date" value="{{ flight_date }}" /></td>
                 </tr>
                 <tr>
                     <td><strong>実施者</strong></td>
-                    <td colspan="2"><a href="{% url 'new_flight' %}">操縦者リンク</a>{{ pilot_data }}</td>
+                    <td colspan="3"><a href="{% url 'new_flight' %}">操縦者リンク</a>{{ pilot_data }}</td>
                 </tr>
             </tbody>
         </table>

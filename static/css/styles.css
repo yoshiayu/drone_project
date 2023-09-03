@@ -1,55 +1,53 @@
-.container {
-    max-width: 1200px;
-    width: 100%;
-    margin: auto;
-    padding: 20px;
-    box-sizing: border-box;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.5);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.input-group button, 
-.timer button, 
-#save-record, 
-#export-csv {
-    width: 50%; /* ボタンの横幅を50%に変更 */
-    margin: auto;
-    font-size: 1.1em;
-    padding: 10px 20px;
-    border: none;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    white-space: nowrap; /* 文字が上下に分かれないように設定 */
-}
-
 body {
     margin: 0;
     padding: 0;
     background-image: url('/static/images/image.png');
     background-size: cover;
     background-position: center;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Dancing Script', cursive;
+    font-size: 20px;
+    color: black;
+    text-align: center;
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+    margin: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 1.5);
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 h1 {
     text-align: center;
+    text-shadow: 333;
     margin-bottom: 20px;
     color: #333;
     font-size: 2.5rem;
 }
-select, #flight-summary {
-    width: 100%;
+
+.header-nav {
+    text-align: right;
 }
-.input-group {
-    margin-bottom: 20px;
-    text-align: center;
+
+.header-nav a {
+    text-decoration: none;
+    color: orange;
+    font-size: 30px;
+    padding: 20px;
+    transition: background-color 0.3s;
 }
+
+.header-nav a:hover {
+    background-color: #eee;
+}
+
 .input-group, .coordinates {
     width: 100%;
     margin-bottom: 1.5rem;
@@ -63,26 +61,21 @@ select, #flight-summary {
 }
 
 .input-group input {
-    border: none;
-    border-bottom: 2px solid #4CAF50;
-    border-radius: 0;
-    outline: none;
-    transition: border-color 0.3s;
     width: 100%;
     padding: .5rem;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
 }
-
-.input-group input, .timer span {
-    width: 90%;
-    font-size: 1.2rem;
-    margin: auto;
-    display: block;
+.coordinates {
+    text-align: center;
 }
-.input-group input:focus {
-    border-color: #5AD88F;
+#flight-summary {
+    width: 106%;
+    padding: .5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
 }
 
 .timer {
@@ -91,66 +84,18 @@ select, #flight-summary {
     align-items: center;
     width: 100%;
 }
-.timer .timer-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
-.timer button {
-    margin: 0 10px; /* 左右に20pxのマージンを設定 */
-}
-.timer button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed; /* 無効なボタンにはnot-allowedカーソルを表示 */
-}
-
-.timer label {
-    font-size: 1.2em;
-}
 .timer label, .timer span {
-    font-size: 1.2em;
+    font-size: 2.0em;
 }
 
-.timer-button {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-#flight-time {
-    margin: 10px;
-    align-self: center;
-    width: 180px;
-    font-size: 3.2em;
-}
-#flight-time, #total-flight-time {
-    margin: 10px;
-    align-self: center;
-    width: 180px;
-    font-size: 3.2em;
-}
-
-#total-flight-time {
-    font-size: 3.2em;
-    width: 180px;
-}
-.button-container {
+.timer-button, .button-container {
     display: flex;
     gap: 1rem;
     justify-content: center;
     width: 100%;
 }
-button {
-    padding: .75rem 1.5rem;
-    font-size: 1rem;
-    color: #fff;
-    background-color: #4CAF75;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color .3s ease;
-}
+
 button, .input-group button, .timer button, #save-record, #export-csv {
     width: 50%;
     margin: auto;
@@ -162,253 +107,40 @@ button, .input-group button, .timer button, #save-record, #export-csv {
     border-radius: 4px;
     cursor: pointer;
     white-space: nowrap;
+    transition: background-color .3s ease;
 }
+
+button:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
 button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
 
-button:hover:not(:disabled) {
-    background-color: #5AD88F;
-}
 button:active, button:focus {
     outline: none;
 }
-.custom-select {
-    position: relative;
-    width: 100%;
-}
-
-.custom-select select {
-    display: block;
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
-    background-color: #fff;
-    appearance: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-}
 
 #map {
-    width: 100%;
+    width: 90%;
     height: 400px;
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.1);
 }
 
-.coordinates {
-    font-size: 1.1em;
-    color: #444;
-    text-align: center;
+#existing-excel-file {
+    display: none;
 }
-.button-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-#save-record, #export-csv {
-    width: 50%; /* ボタンの横幅を50%に変更 */
-    margin: 10px; /* 両側のボタンに10pxのマージンを設定 */
-    font-size: 1.5em;
-    padding: 10px 20px;
-    border: none;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    white-space: nowrap; /* 文字が上下に分かれないように設定 */
+#existing-maintenance-excel-file {
+    display: none;
 }
 
-button:active, button:focus {
-    outline: none;
-    transform: none;
-}
 
 @media (min-width: 800px) {
     #map {
         width: 90%;
     }
-}
-.container {
-    max-width: 1200px;
-    width: 100%; /* コンテナの横幅を90%に変更 */
-    margin: auto;
-    padding: 20px;
-    box-sizing: border-box;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.5);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.input-group button, 
-.timer button, 
-#save-record, 
-#export-csv {
-    width: 50%; /* ボタンの横幅を50%に変更 */
-    margin: auto;
-    font-size: 1.1em;
-    padding: 10px 20px;
-    border: none;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    white-space: nowrap; /* 文字が上下に分かれないように設定 */
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    background-image: url('/static/images/image.png');
-    background-size: cover;
-    background-position: center;
-    font-family: 'Arial', sans-serif;
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-    font-size: 2.5rem;
-}
-
-.input-group {
-    margin-bottom: 20px;
-    text-align: center;
-}
-.input-group, .coordinates {
-    width: 100%;
-    margin-bottom: 1.5rem;
-    text-align: left;
-}
-
-.input-group label, .coordinates label {
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin-bottom: .5rem;
-}
-
-.input-group input {
-    width: 100%;
-    padding: .5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-.input-group input, .timer span {
-    width: 90%;
-    font-size: 1.2rem;
-    margin: auto;
-    display: block;
-}
-
-.timer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-.timer .timer-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.timer button {
-    margin: 0 10px; /* 左右に20pxのマージンを設定 */
-}
-.timer button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed; /* 無効なボタンにはnot-allowedカーソルを表示 */
-}
-
-.timer label {
-    font-size: 1.2em;
-}
-.timer-button {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-#flight-time {
-    margin: 10px;
-    align-self: center;
-    width: 180px;
-    font-size: 3.2em;
-}
-
-#total-flight-time {
-    font-size: 3.2em;
-    width: 180px;
-}
-.button-container {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    width: 100%;
-}
-button {
-    padding: .75rem 1.5rem;
-    font-size: 1rem;
-    color: #fff;
-    background-color: #4CAF50;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color .3s ease;
-}
-
-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-button:hover:not(:disabled) {
-    background-color: #45a049;
-}
-#map {
-    width: 100%;
-    height: 400px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-}
-
-.coordinates {
-    font-size: 1.1em;
-    color: #444;
-    text-align: center;
-}
-.button-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-#save-record, #export-csv {
-    width: 50%; /* ボタンの横幅を50%に変更 */
-    margin: 10px; /* 両側のボタンに10pxのマージンを設定 */
-    font-size: 1.5em;
-    padding: 10px 20px;
-    border: none;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    white-space: nowrap; /* 文字が上下に分かれないように設定 */
-}
-
-button:active, button:focus {
-    outline: none;
-    transform: none;
 }

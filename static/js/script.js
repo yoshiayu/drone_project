@@ -213,6 +213,9 @@ document.getElementById("export-csv").addEventListener("click", exportCSV);
 
 
 function initMap() {
+    if (window.map) {
+        google.maps.event.clearInstanceListeners(window.map);
+    }    
     // 東京の緯度と経度に設定
     var centerCoordinates = { lat: 35.6895, lng: 139.6917 };
     var map = new google.maps.Map(document.getElementById('map'), {
