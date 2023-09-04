@@ -17,7 +17,7 @@
 <div class="header-nav">
     <a href="{% url 'home' %}">MAIN</a> | 
     <a href="{% url 'maintenance_record' %}">Mainte</a> |
-    {% comment %} <a href="{% url 'I$M_record' %}">I&M record</a> {% endcomment %}
+    {% comment %} <a href="{% url 'I&M_record' %}">I&M record</a> {% endcomment %}
 </div>
 
 <body>
@@ -71,7 +71,7 @@
         <div class="timer">
             <div class="timer-button">
                 <button id="start-takeoff">離陸 スタート</button>
-                <button id="pause-takeoff">一時 停止</button>
+                <button id="pause-takeoff" style="display: none;" />一時 停止</button>
                 <button id="stop-landing" disabled>着陸 ストップ</button>
             </div>
             <span id="flight-time">00:00:00</span>
@@ -95,7 +95,7 @@
 
         <div class="button-container">
             <button id="save-record">記録を保存</button>
-            <button id="export-csv">CSVに出力</button>
+            <button id="export-csv" style="display: none;" />CSVに出力</button>
             <button type="button" id="export-excel">Excelに出力</button>
             <input type="file" id="existing-excel-file" />
        

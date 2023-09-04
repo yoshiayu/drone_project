@@ -16,9 +16,9 @@ body {
     margin: auto;
     padding: 20px;
     box-sizing: border-box;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 1.5);
     border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.7);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -26,6 +26,7 @@ body {
 
 h1 {
     text-align: center;
+    text-shadow: 333;
     margin-bottom: 20px;
     color: #333;
     font-size: 2.5rem;
@@ -66,6 +67,16 @@ h1 {
     border-radius: 4px;
     font-size: 1rem;
 }
+.coordinates {
+    text-align: center;
+}
+#flight-summary {
+    width: 106%;
+    padding: .5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
 
 .timer {
     display: flex;
@@ -75,7 +86,7 @@ h1 {
 }
 
 .timer label, .timer span {
-    font-size: 1.2em;
+    font-size: 2.0em;
 }
 
 .timer-button, .button-container {
@@ -117,7 +128,17 @@ button:active, button:focus {
     height: 400px;
     margin-bottom: 20px;
     border-radius: 8px;
-    box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.1);
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.1);
+}
+
+#existing-excel-file {
+    display: none;
+}
+#existing-maintenance-excel-file {
+    display: none;
+}
+.button-container button #export-csv {
+    display: none;
 }
 
 @media (min-width: 800px) {
