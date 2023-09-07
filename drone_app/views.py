@@ -21,6 +21,9 @@ from .models import Maintenance
 def maintenance_record(request):
     return render(request, 'Maintenance_record.html')
 
+def im_record(request):
+    return render(request, 'I&M_record.html')
+
 def flight_summaries(request):
     flights = Flight.objects.all()
     summaries = [flight.flight_summary() for flight in flights]

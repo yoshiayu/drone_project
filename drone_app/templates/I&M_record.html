@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ja">
-
+    {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% load static %}
+    
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
@@ -15,7 +15,83 @@
 <div class="header-nav">
     <a href="{% url 'home' %}">MAIN</a> | 
     <a href="{% url 'maintenance_record' %}">Mainte</a> |
-    <a href="{% url 'I&M_record' %}">I&M record</a>
+    <a href="{% url 'I&M_record' %}">I&M record</a> |
+    <a href="{% url 'new_flight' %}">戻る</a>
+    <style>       
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('/static/images/image.png');
+            background-size: cover;
+            background-position: center;
+            font-family: 'Dancing Script', cursive;
+            font-size: 20px;
+            color: black;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 1.5);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .maintenance-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        .maintenance-table th,
+        .maintenance-table td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        button, .return-button {
+            padding: 5px 20px;
+            margin-top: 5px;
+            border: none;
+            background-color: #002BFF;
+            color: white;
+            border-radius: 10px;
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-right: 10px;
+            box-shadow: 0 10px 8px rgba(0, 0, 0, 0.1);
+        }
+        button:hover, .return-button:hover {
+            background-color: #009BFF;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+    
+        .input-group label {
+            display: block;
+            margin-bottom: 1px;
+            margin-top: -15px;
+        }
+        
+        #save-record:hover {
+            background-color: #ff6600; /* この色をお好みのものに変更してください */
+        }
+        #export-csv {
+            display: none;
+        }
+        #existing-maintenance-excel-file {
+            display: none;
+        }
+        @media (min-width: 800px) {
+            #map {
+                width: 90%;
+            }
+        }
+    </style>
 </div>
 
 <body>
@@ -31,7 +107,7 @@
                 <label for="total-flight-time">総飛行時間:</label>
                 <span id="total-flight-time">00:00:00</span>
             </div>
-            <div class="input-group">
+            <div class="input-group ">
                 <label for="maintenance-details">点検・修理・改造及び整備の内容:</label>
                 <textarea id="maintenance-details" rows="4" placeholder="内容を入力"></textarea>
             </div>

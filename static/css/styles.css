@@ -33,7 +33,7 @@ h1 {
 }
 
 .header-nav {
-    text-align: right;
+    text-align: center;
 }
 
 .header-nav a {
@@ -139,6 +139,10 @@ button:active, button:focus {
 }
 .button-container button #export-csv {
     display: none;
+}
+
+.input-group textarea {
+    margin-top: 20px;
 }
 
 @media (min-width: 800px) {
