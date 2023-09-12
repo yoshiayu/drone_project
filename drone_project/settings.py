@@ -7,6 +7,8 @@ from django.utils import timezone
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 file_path = os.path.join(BASE_DIR, 'static', '飛行日誌.xlsx')
+file_path = os.path.join(BASE_DIR, 'static', '飛行日誌1.xlsx')
+file_path = os.path.join(BASE_DIR, 'static', '飛行日誌2.xlsx')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/

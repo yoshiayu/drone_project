@@ -141,6 +141,10 @@ button:active, button:focus {
     display: none;
 }
 
+.input-group textarea {
+    margin-top: 20px;
+}
+
 @media (min-width: 800px) {
     #map {
         width: 90%;
