@@ -85,7 +85,7 @@ function stopFlightTimer() {
 
 // イベントリスナーの設定
 document.getElementById('start-takeoff').addEventListener('click', startFlightTimer);
-document.getElementById('stop-landing').addEventListener('click', stopFlightTimer);
+
 document.getElementById('save-record').addEventListener('click', saveRecord);
 // document.getElementById('export-csv').addEventListener('click', exportCSV);
 document.getElementById("export-csv").addEventListener("click", function() {
@@ -108,9 +108,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 });
-
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById('stop-landing').addEventListener('click', stopFlightTimer);
+});
 // adminに保存処理を実装します
 function saveRecord() {
+    console.log(data);  // この行をsaveRecord関数内に追加して、データをコンソールに出力
+
     const flightDate = document.getElementById("flight-date").value;
     const pilotName = document.getElementById("pilot-name").value;
     const takeoffTime = document.getElementById("takeoff-time").value;
@@ -147,9 +151,18 @@ function saveRecord() {
             document.getElementById('message').textContent = 'There was an error while saving the record. Please try again.';
         }
     })
+    .then(json => {
+        if (json.success) {
+            document.getElementById('message').textContent = 'Record saved successfully';
+        } else {
+            document.getElementById('message').textContent = 'Error: ' + json.error;
+        }
+    })    
+    
     .catch(error => {
         document.getElementById('message').textContent = 'There was an error while saving the record. Please try again.';
     });
+    
 }
 
 // 総飛行時間を計算して表示する関数
@@ -272,6 +285,14 @@ function initMap() {
             updateCoordinates(type, marker.getPosition());
         });
     }
+    // マーカーのドラッグイベントの後に追加
+marker.addListener('dragend', function() {
+    const pos = marker.getPosition();
+    document.getElementById("takeoff-coordinates").textContent = '緯度: ' + pos.lat() + ', 経度: ' + pos.lng();
+
+    // ローカルストレージに離陸座標を保存
+    localStorage.setItem('takeoff_coordinates', '緯度: ' + pos.lat() + ', 経度: ' + pos.lng());
+});
     
     function updateCoordinates(type, location) {
         // 指定されたタイプの座標を更新

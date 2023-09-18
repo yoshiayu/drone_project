@@ -100,6 +100,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+# GDAL_LIBRARY_PATH = '/opt/homebrew/Cellar/gdal/3.7.2/lib/libgdal.dylib'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/

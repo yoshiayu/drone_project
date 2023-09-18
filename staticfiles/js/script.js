@@ -272,6 +272,14 @@ function initMap() {
             updateCoordinates(type, marker.getPosition());
         });
     }
+    // マーカーのドラッグイベントの後に追加
+marker.addListener('dragend', function() {
+    const pos = marker.getPosition();
+    document.getElementById("takeoff-coordinates").textContent = '緯度: ' + pos.lat() + ', 経度: ' + pos.lng();
+
+    // ローカルストレージに離陸座標を保存
+    localStorage.setItem('takeoff_coordinates', '緯度: ' + pos.lat() + ', 経度: ' + pos.lng());
+});
     
     function updateCoordinates(type, location) {
         // 指定されたタイプの座標を更新

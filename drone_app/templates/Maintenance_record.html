@@ -155,21 +155,23 @@
                 <!-- 実施情報 -->
                 <tr>
                     <td><strong>実施場所</strong></td>
-                    <td colspan="3"><a href="{% url 'new_flight' %}">座標リンク</a>{{ coordinate_data }}</td>
-                </tr>
+                    <td colspan="3"><p>実施場所: {{ takeoff_location }}</p></td>
+               </tr>
                 <tr>
                     <td><strong>実施年月日</strong></td>
                     <td colspan="3"><input type="date" value="{{ flight_date }}" /></td>
                 </tr>
                 <tr>
                     <td><strong>実施者</strong></td>
-                    <td colspan="3"><a href="{% url 'new_flight' %}">操縦者リンク</a>{{ pilot_data }}</td>
+                    <td colspan="3"><p>実施者: {{ pilot }}</p>{{ pilot_data }}</td>
                 </tr>
             </tbody>
         </table>
+        <div id="message"></div>
 
         <div class="button-container">
-            <button id="save-maintenance">記録を保存</button>
+            <button id="save-to-server">記録を保存</button>
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             <button id="export-maintenance-excel">Excelに出力</button>
             <input type="file" id="existing-maintenance-excel-file" />
         </div>

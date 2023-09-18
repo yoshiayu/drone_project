@@ -1,9 +1,8 @@
 from django.utils import timezone
 from datetime import datetime
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import Flight
+from .models import Flight, FlightRecord, Maintenance
 from .forms import FlightForm
-from .models import FlightRecord
 import csv
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -16,10 +15,47 @@ import os
 from django.conf import settings
 from django.http import FileResponse
 import logging
-from .models import Maintenance
+from django.contrib import messages
+import logging
+
+logger = logging.getLogger(__name__)
+
+def maintenance_view(request):
+    # new_flightの最新のデータを取得
+    last_flight = Flight.objects.latest('created_at')  # created_atは作成日時を保持するフィールドとして仮定
+    context = {
+        'coordinate_data': last_flight.coordinate_data,  # coordinate_dataはFlightモデルのフィールドとして仮定
+        # 他のコンテキストデータもこちらに...
+    }
+    return render(request, 'path_to_your_template.html', context)
+
+# def maintenance_record(request):
+#     try:
+#         last_flight = Flight.objects.latest('date')
+#         takeoff_location = f"{last_flight.takeoff_location_lat}, {last_flight.takeoff_location_lng}"
+#     except Flight.DoesNotExist:
+#         takeoff_location = "No flight data available"
+
+#     context = {
+#         'takeoff_location': takeoff_location,
+#     }
+#     return render(request, 'Maintenance_record.html', context)
 
 def maintenance_record(request):
-    return render(request, 'Maintenance_record.html')
+    try:
+        last_flight = Flight.objects.latest('date')
+        if last_flight:
+            takeoff_location = f"{last_flight.takeoff_location_lat}, {last_flight.takeoff_location_lng}"
+        else:
+            takeoff_location = "No flight data"
+    except Flight.DoesNotExist:
+        takeoff_location = "No flight data available"
+
+    context = {
+        'takeoff_location': takeoff_location,
+        # 他のコンテキストデータもこちらに...
+    }
+    return render(request, 'Maintenance_record.html', context)
 
 def im_record(request):
     return render(request, 'I&M_record.html')
@@ -41,20 +77,25 @@ def parse_time(date_obj, time_str):
 def save_record(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        
+        print(data)
+
         try:
             record = FlightRecord(
                 date=data['date'],
                 pilot=data['pilot'],
                 takeoff_time=data['takeoff_time'],
                 landing_time=data['landing_time'],
+                summary=data['summary']
             )
             record.save()
             return JsonResponse({'success': True})
         except Exception as e:
+            print("Error while saving record:", e)
             return JsonResponse({'success': False, 'error': str(e)})
-    
+
+    # POST以外のリクエストメソッドが来た場合、あるいはその他の例外的な場合に返す
     return JsonResponse({'success': False, 'error': 'Invalid request'})
+
 def export_data_to_excel(request):
     absolute_path = '/Users/yoshiayu/drone_project/static/飛行日誌.xlsx'
     # file_path = '飛行日誌.xlsx'
@@ -108,11 +149,26 @@ def new_flight(request):
             flight.save()
             return redirect('flight_detail', flight_id=flight.id)
         else:
-            return render(request, 'new_flight.html', {'form': form})
+            return render(request, 'new_flight.html', {'form': form, 'errors': form.errors})
     else:
         form = FlightForm()
         return render(request, 'new_flight.html', {'form': form})
-    
+
+# def new_flight(request):
+#     if request.method == 'POST':
+#         form = FlightForm(request.POST)
+#         if form.is_valid():
+#             flight = form.save()
+#             flight.takeoff_time = timezone.now()
+#             flight.save()
+#             return redirect('flight_detail', flight_id=flight.id)
+#         else:
+#             messages.error(request, "データの保存に失敗しました。入力内容を再度確認してください。")
+#             return render(request, 'new_flight.html', {'form': form})
+#     else:
+#         form = FlightForm()
+#         return render(request, 'new_flight.html', {'form': form})
+
 def import_data_from_excel(request):
     file_path = '飛行日誌.xlsx'
     data = pd.read_excel(file_path, engine='openpyxl')
@@ -137,39 +193,16 @@ def get_excel_file(request):
         # ファイルが存在しない場合の処理
         return JsonResponse({"success": False, "error": "File not found"})
 
-# def maintenance_record(request):
+# def new_flight(request):
 #     if request.method == 'POST':
-#         # この部分は、formから送信されたデータを取り扱うロジックです。
-#         # ここに具体的な処理を記述する必要があります。
-#         # 例えば、新しいMaintenanceレコードを保存する処理などです。
-#         form = MaintenanceForm(request.POST)
+#         form = FlightForm(request.POST)
 #         if form.is_valid():
-#              form.save()
-#         return redirect('maintenance_record')
-#         pass
-
+#             flight = form.save()
+#             flight.takeoff_time = timezone.now()
+#             flight.save()
+#             return redirect('flight_detail', flight_id=flight.id)
+#         else:
+#             return render(request, 'new_flight.html', {'form': form, 'errors': form.errors})
 #     else:
-#         try:
-#             last_record = Flight.objects.latest('id')
-#             context = {
-#                 'coordinate_data': last_record.takeoff_location,  # 適切な属性名に変更
-#                 'flight_date': last_record.date,
-#                 'pilot_data': last_record.pilot
-#             }
-#         except Flight.DoesNotExist:
-#             context = {
-#                 'coordinate_data': '',
-#                 'flight_date': '',
-#                 'pilot_data': ''
-#             }
-#         return render(request, 'drone_app/Maintenance_record.html', context)
-
-
-def maintenance_record(request):
-    # 仮のデータをセットします。実際にはデータベースからデータを取得するロジックに置き換える必要があります。
-    context = {
-        'coordinate_data': "座標情報をここに",
-        'flight_date': timezone.now().date(),  # 現在の日付
-        'pilot_data': "操縦者情報をここに",
-    }
-    return render(request, 'Maintenance_record.html', context)
+#         form = FlightForm()
+#         return render(request, 'new_flight.html', {'form': form})
