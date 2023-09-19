@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
     const exportBtn = document.getElementById('export-maintenance-excel');
     const saveBtn = document.getElementById('save-to-server');  // 新しく作成した「記録を保存」ボタン
-
-    const takeoffLocation = document.getElementById('takeoffLocation').value;
+    const takeoffLocationElement = document.getElementById('takeoffLocation');
+    const takeoffLocation = takeoffLocationElement ? takeoffLocationElement.textContent.replace("実施場所: ", "").trim() : null;
 
     if (takeoffLocation) {
         // 実施場所の欄に座標情報を表示する

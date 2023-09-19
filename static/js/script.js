@@ -111,16 +111,30 @@ document.addEventListener('DOMContentLoaded', (event) => {
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('stop-landing').addEventListener('click', stopFlightTimer);
 });
+
+function extractCoordinates(id) {
+    const coordinatesText = document.getElementById(id).textContent;
+    const match = coordinatesText.match(/緯度: ([\d.]+), 経度: ([\d.]+)/);
+    if (match) {
+        return {
+            x: parseFloat(match[1]),
+            y: parseFloat(match[2])
+        };
+    }
+    return null;
+}
+
 // adminに保存処理を実装します
 function saveRecord() {
-    console.log(data);  // この行をsaveRecord関数内に追加して、データをコンソールに出力
-
+    
     const flightDate = document.getElementById("flight-date").value;
     const pilotName = document.getElementById("pilot-name").value;
     const takeoffTime = document.getElementById("takeoff-time").value;
     const landingTime = document.getElementById("landing-time").value;
     const flightSummaryElement = document.getElementById("flight-summary");
     const flightSummary = flightSummaryElement.options[flightSummaryElement.selectedIndex].text;
+    const takeoffLocationObj = extractCoordinates("takeoff-coordinates");
+    const landingLocationObj = extractCoordinates("landing-coordinates");
 
     const data = {
         date: flightDate,
@@ -128,7 +142,14 @@ function saveRecord() {
         summary: flightSummary,
         takeoff_time: takeoffTime,
         landing_time: landingTime,
+        takeoff_location: takeoffLocationObj,
+        landing_location: landingLocationObj,
     };
+    
+    console.log(data);
+    console.log('Takeoff:', takeoffLocationObj);
+    console.log('Landing:', landingLocationObj);
+
     
     fetch('/save_record/', {
         method: 'POST',
@@ -143,13 +164,6 @@ function saveRecord() {
             throw new Error('Network response was not ok');
         }
         return response.json();
-    })
-    .then(json => {
-        if (json.success) {
-            document.getElementById('message').textContent = 'Record saved successfully';
-        } else {
-            document.getElementById('message').textContent = 'There was an error while saving the record. Please try again.';
-        }
     })
     .then(json => {
         if (json.success) {
@@ -285,19 +299,38 @@ function initMap() {
             updateCoordinates(type, marker.getPosition());
         });
     }
-    // マーカーのドラッグイベントの後に追加
-marker.addListener('dragend', function() {
-    const pos = marker.getPosition();
-    document.getElementById("takeoff-coordinates").textContent = '緯度: ' + pos.lat() + ', 経度: ' + pos.lng();
+    marker.addListener('dragend', function() {
+        const pos = marker.getPosition();
+        document.getElementById("takeoff-coordinates").textContent = '緯度: ' + pos.lat() + ', 経度: ' + pos.lng();
+    
+        // ローカルストレージに離陸座標を保存
+        localStorage.setItem('takeoff_coordinates', '緯度: ' + pos.lat() + ', 経度: ' + pos.lng());
+    });
+    
+    function attachMarkerListeners(marker, type) {
+        // マーカーがドラッグされた際に座標を更新
+        marker.addListener('dragend', function() {
+            updateCoordinates(type, marker.getPosition());
+    
+            // ローカルストレージに座標を保存
+            localStorage.setItem(`${type}_coordinates`, '緯度: ' + marker.getPosition().lat() + ', 経度: ' + marker.getPosition().lng());
+        });
+    }
+//     // マーカーのドラッグイベントの後に追加
+//     marker.addListener('dragend', function() {
+//         const pos = marker.getPosition();
+//         document.getElementById("takeoff-coordinates").textContent = '緯度: ' + pos.lat() + ', 経度: ' + pos.lng();
 
-    // ローカルストレージに離陸座標を保存
-    localStorage.setItem('takeoff_coordinates', '緯度: ' + pos.lat() + ', 経度: ' + pos.lng());
-});
+//     // ローカルストレージに離陸座標を保存
+//     localStorage.setItem('takeoff_coordinates', '緯度: ' + pos.lat() + ', 経度: ' + pos.lng());
+// });
     
     function updateCoordinates(type, location) {
-        // 指定されたタイプの座標を更新
+    // 指定されたタイプの座標を更新
         document.getElementById(`${type}-coordinates`).textContent = '緯度: ' + location.lat() + ', 経度: ' + location.lng();
+        console.log(`${type} updated to: 緯度: ${location.lat()}, 経度: ${location.lng()}`);
     }
+
 }
 
 function appendDataToExcel(fileInput) {
@@ -394,34 +427,3 @@ document.getElementById('export-excel').addEventListener('click', function(e) {
 
     oReq.send();
 });
-
-
-
-// function appendDataToExcel(fileInput) {
-//     const reader = new FileReader();
-//     const flightSummaryElement = document.getElementById("flight-summary");
-//     const flightSummary = flightSummaryElement.options[flightSummaryElement.selectedIndex].text;
-
-//     reader.onload = function(e) {
-//         const data = e.target.result;
-//         const workbook = XLSX.read(data, {type: 'binary'});
-//         const sheetName = workbook.SheetNames[0];
-//         const sheet = workbook.Sheets[sheetName];
-//         const newRow = [
-//             document.getElementById("flight-date").value,
-//             document.getElementById("pilot-name").value,
-//             flightSummary,
-//             document.getElementById("takeoff-time").value,
-//             document.getElementById("landing-time").value,
-//             document.getElementById("total-flight-time").textContent,
-//             document.getElementById("takeoff-coordinates").textContent,
-//             document.getElementById("landing-coordinates").textContent
-//         ];
-//         const lastRow = XLSX.utils.decode_range(sheet['!ref']).e.r + 1;
-//         const newRange = XLSX.utils.encode_range({s: {c: 0, r: lastRow}, e: {c: newRow.length - 1, r: lastRow}});
-//         XLSX.utils.sheet_add_aoa(sheet, [newRow], {origin: newRange});
-//         XLSX.writeFile(workbook, "updated_flight_data.xlsx");
-//     };
-
-//     reader.readAsBinaryString(fileInput.files[0]);
-// }

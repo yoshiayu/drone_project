@@ -16,7 +16,6 @@ from django.conf import settings
 from django.http import FileResponse
 import logging
 from django.contrib import messages
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -73,28 +72,76 @@ def parse_time(date_obj, time_str):
         return timezone.make_aware(datetime.combine(date_obj, time_obj))
     except ValueError:
         return None
+
 @csrf_exempt
 def save_record(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         print(data)
-
         try:
+            takeoff_location_str = "未知"  # または適切なデフォルト値を設定
+            landing_location_str = "未知"  # または適切なデフォルト値を設定
+
+            if data.get('takeoff_location'):
+                takeoff_location_str = f"{data['takeoff_location']['x']}, {data['takeoff_location']['y']}"
+                
+            if data.get('landing_location'):
+                landing_location_str = f"{data['landing_location']['x']}, {data['landing_location']['y']}"
+
+        # try:
+        #     takeoff_location_str = None
+        #     landing_location_str = None
+
+        #     if data.get('takeoff_location'):
+        #         takeoff_location_str = f"{data['takeoff_location']['x']}, {data['takeoff_location']['y']}"
+                
+        #     if data.get('landing_location'):
+        #         landing_location_str = f"{data['landing_location']['x']}, {data['landing_location']['y']}"
+
             record = FlightRecord(
                 date=data['date'],
                 pilot=data['pilot'],
                 takeoff_time=data['takeoff_time'],
                 landing_time=data['landing_time'],
-                summary=data['summary']
+                summary=data['summary'],
+                takeoff_location=takeoff_location_str,
+                landing_location=landing_location_str,
             )
             record.save()
             return JsonResponse({'success': True})
         except Exception as e:
             print("Error while saving record:", e)
             return JsonResponse({'success': False, 'error': str(e)})
-
-    # POST以外のリクエストメソッドが来た場合、あるいはその他の例外的な場合に返す
+    
     return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+# @csrf_exempt
+# def save_record(request):
+#     if request.method == 'POST':
+#         data = json.loads(request.body)
+#         print(data)
+
+#         try:
+#             # 座標情報を文字列として保存
+#             takeoff_location_str = f"{data['takeoff_location']['x']}, {data['takeoff_location']['y']}"
+#             landing_location_str = f"{data['landing_location']['x']}, {data['landing_location']['y']}"
+
+#             record = FlightRecord(
+#                 date=data['date'],
+#                 pilot=data['pilot'],
+#                 takeoff_time=data['takeoff_time'],
+#                 landing_time=data['landing_time'],
+#                 summary=data['summary'],
+#                 takeoff_location=takeoff_location_str,
+#                 landing_location=landing_location_str,
+#             )
+#             record.save()
+#             return JsonResponse({'success': True})
+#         except Exception as e:
+#             print("Error while saving record:", e)
+#             return JsonResponse({'success': False, 'error': str(e)})
+
+#     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 def export_data_to_excel(request):
     absolute_path = '/Users/yoshiayu/drone_project/static/飛行日誌.xlsx'
