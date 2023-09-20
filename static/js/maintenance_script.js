@@ -121,7 +121,7 @@ function saveToServer(workbook) {
         workbook: XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]])
     };
     
-    fetch('/save_record/', {
+    fetch('/save_maintenance_record/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

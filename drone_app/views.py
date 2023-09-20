@@ -1,7 +1,7 @@
 from django.utils import timezone
 from datetime import datetime
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import Flight, FlightRecord, Maintenance
+from .models import Flight, FlightRecord, Maintenance, MaintenanceRecord
 from .forms import FlightForm
 import csv
 from django.http import JsonResponse, HttpResponse
@@ -113,6 +113,48 @@ def save_record(request):
             print("Error while saving record:", e)
             return JsonResponse({'success': False, 'error': str(e)})
     
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+@csrf_exempt
+def save_maintenance_record(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        
+        try:
+            for row in data['workbook']:
+                print("Processing:", row)
+
+                # 日付のデータを取得
+                date_str = row.get('実施年月日 DATE', None)
+                if date_str:
+                    date_format = "%Y-%m-%d"
+                    date_obj = datetime.strptime(date_str, date_format).date()
+                else:
+                    print("Date not found in row:", row)
+                    continue
+
+                # 結果の変換
+                result = True if row.get('_1', '').lower() == 'true' else False
+
+                record = MaintenanceRecord(
+                    inspection_item=row.get('（様式２）日常点検記録', ''),
+                    inspection_content=row.get('', ''),
+                    result=result,
+                    remarks=row.get('_2', ''),
+                    location=row.get('実施場所', ''),
+                    date=date_obj,
+                    inspector=row.get('_1', '')
+                )
+                record.save()
+
+            return JsonResponse({'success': True})
+
+        except KeyError as ke:
+            print("KeyError:", ke)
+            return JsonResponse({'success': False, 'error': f'Missing key: {ke}'})
+        except Exception as e:
+            print("Error while saving maintenance record:", e)
+            return JsonResponse({'success': False, 'error': str(e)})
+
     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 # @csrf_exempt

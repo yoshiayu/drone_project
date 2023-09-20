@@ -12,6 +12,7 @@ urlpatterns = [
     path('export_data_to_excel/', views.export_data_to_excel, name='export_data_to_excel'),
     path('flight-summaries/', views.flight_summaries, name='flight_summaries'),
     # path('export_data_to_excel/', views.export_data_to_excel, name='export_data_to_excel'),
-    path('get_excel/', views.get_excel_file, name='get_excel_file')
+    path('get_excel/', views.get_excel_file, name='get_excel_file'),
+    path('save_maintenance_record/', views.save_maintenance_record, name='save_maintenance_record'),
 
 ]
