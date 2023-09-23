@@ -155,15 +155,17 @@
                 <!-- 実施情報 -->
                 <tr>
                     <td><strong>実施場所</strong></td>
-                    <td colspan="3"><p id="takeoffLocation">実施場所: {{ takeoff_coordinates }}</p></td>
+                    <td colspan="3"><input type="text" id="takeoffLocation" value="{{ takeoff_coordinates }}"></td>
+                    {% comment %} <td colspan="3"><p id="takeoffLocation">実施場所: {{ takeoff_coordinates }}</p></td> {% endcomment %}
                </tr>
                 <tr>
                     <td><strong>実施年月日</strong></td>
-                    <td colspan="3"><input type="date" value="{{ flight_date }}" /></td>
+                    <td colspan="3"><input type="date"></td>
                 </tr>
                 <tr>
                     <td><strong>実施者</strong></td>
-                    <td colspan="3"><p>実施者: {{ pilot }}</p>{{ pilot_data }}</td>
+                    <td colspan="3"><input type="text" id="pilot" value="{{ pilot }}"></td>
+                    {% comment %} <td colspan="3"><p id="pilot">実施者: {{ pilot }}</p>{{ pilot_data }}</td> {% endcomment %}
                 </tr>
             </tbody>
         </table>

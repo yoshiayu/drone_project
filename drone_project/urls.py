@@ -10,5 +10,6 @@ urlpatterns = [
     path('save_record/', drone_app_views.save_record, name='save_record'),
     path('export_flights_csv/', drone_app_views.export_flights_csv, name='export_flights_csv'),
     path('export_data_to_excel/', views.export_data_to_excel, name='export_data_to_excel'),
+    path('save_maintenance_record/', views.save_maintenance_record, name='save_maintenance_record'),
 ]
 

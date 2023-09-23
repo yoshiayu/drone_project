@@ -55,11 +55,12 @@ class Maintenance(models.Model):
     
     def __str__(self):
         return f"{self.flight_date} - {self.pilot_data}"
+    
 class MaintenanceRecord(models.Model):
-    inspection_item = models.CharField(max_length=100)
+    inspection_item = models.CharField(max_length=255, null=True, blank=True)
     inspection_content = models.TextField()
     result = models.BooleanField()
     remarks = models.TextField(blank=True, null=True)
-    location = models.TextField()
-    date = models.DateField()
-    inspector = models.CharField(max_length=100)
+    location = models.CharField(max_length=255, null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
+    inspector = models.CharField(max_length=255, null=True, blank=True)

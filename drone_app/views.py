@@ -1,15 +1,17 @@
 from django.utils import timezone
 from datetime import datetime
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import Flight, FlightRecord, Maintenance, MaintenanceRecord
+from .models import Flight, FlightRecord, MaintenanceRecord
 from .forms import FlightForm
 import csv
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 import json
 import pandas as pd
 import xml.etree.ElementTree as ET
-import openpyxl
+import traceback
 from wsgiref.util import FileWrapper
 import os
 from django.conf import settings
@@ -27,18 +29,6 @@ def maintenance_view(request):
         # 他のコンテキストデータもこちらに...
     }
     return render(request, 'path_to_your_template.html', context)
-
-# def maintenance_record(request):
-#     try:
-#         last_flight = Flight.objects.latest('date')
-#         takeoff_location = f"{last_flight.takeoff_location_lat}, {last_flight.takeoff_location_lng}"
-#     except Flight.DoesNotExist:
-#         takeoff_location = "No flight data available"
-
-#     context = {
-#         'takeoff_location': takeoff_location,
-#     }
-#     return render(request, 'Maintenance_record.html', context)
 
 def maintenance_record(request):
     try:
@@ -88,16 +78,6 @@ def save_record(request):
             if data.get('landing_location'):
                 landing_location_str = f"{data['landing_location']['x']}, {data['landing_location']['y']}"
 
-        # try:
-        #     takeoff_location_str = None
-        #     landing_location_str = None
-
-        #     if data.get('takeoff_location'):
-        #         takeoff_location_str = f"{data['takeoff_location']['x']}, {data['takeoff_location']['y']}"
-                
-        #     if data.get('landing_location'):
-        #         landing_location_str = f"{data['landing_location']['x']}, {data['landing_location']['y']}"
-
             record = FlightRecord(
                 date=data['date'],
                 pilot=data['pilot'],
@@ -108,83 +88,58 @@ def save_record(request):
                 landing_location=landing_location_str,
             )
             record.save()
+            
             return JsonResponse({'success': True})
         except Exception as e:
             print("Error while saving record:", e)
             return JsonResponse({'success': False, 'error': str(e)})
     
     return JsonResponse({'success': False, 'error': 'Invalid request'})
+
 @csrf_exempt
 def save_maintenance_record(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        
         try:
-            for row in data['workbook']:
-                print("Processing:", row)
-
-                # 日付のデータを取得
-                date_str = row.get('実施年月日 DATE', None)
-                if date_str:
-                    date_format = "%Y-%m-%d"
-                    date_obj = datetime.strptime(date_str, date_format).date()
-                else:
-                    print("Date not found in row:", row)
-                    continue
-
-                # 結果の変換
-                result = True if row.get('_1', '').lower() == 'true' else False
-
-                record = MaintenanceRecord(
-                    inspection_item=row.get('（様式２）日常点検記録', ''),
-                    inspection_content=row.get('', ''),
+            received_json_data = json.loads(request.body.decode('utf-8'))
+            
+            date = received_json_data.get('date')
+            if date:
+                date = datetime.strptime(date, '%Y-%m-%d').date()
+            location = received_json_data.get('location')
+            inspector = received_json_data.get('inspector')
+            
+            # location, inspector, date のチェック
+            # if not all([location, inspector, date]):
+            #     return JsonResponse({'status': 'error', 'message': 'Location, inspector, and date are required'}, status=400)
+            
+            workbook_data = received_json_data.get('workbook', [])
+            for row in workbook_data:
+                inspection_item = row.get('inspection_item', '')
+                
+                if not inspection_item or inspection_item.strip() == '':
+                    return JsonResponse({'status': 'error', 'message': f"inspection_item is missing or empty for row: {row}"}, status=400)
+                
+                result = row.get('result') in [True, 'true', 'True', 1, '1']
+                
+                MaintenanceRecord.objects.create(
+                    inspection_item=inspection_item,
+                    inspection_content=row.get('inspection_content'),
                     result=result,
-                    remarks=row.get('_2', ''),
-                    location=row.get('実施場所', ''),
-                    date=date_obj,
-                    inspector=row.get('_1', '')
+                    remarks=row.get('remark'),
+                    date=date,
+                    location=location,
+                    inspector=inspector
                 )
-                record.save()
-
-            return JsonResponse({'success': True})
-
-        except KeyError as ke:
-            print("KeyError:", ke)
-            return JsonResponse({'success': False, 'error': f'Missing key: {ke}'})
+            
+            return JsonResponse({'status': 'success'})
+        
         except Exception as e:
-            print("Error while saving maintenance record:", e)
-            return JsonResponse({'success': False, 'error': str(e)})
-
-    return JsonResponse({'success': False, 'error': 'Invalid request'})
-
-# @csrf_exempt
-# def save_record(request):
-#     if request.method == 'POST':
-#         data = json.loads(request.body)
-#         print(data)
-
-#         try:
-#             # 座標情報を文字列として保存
-#             takeoff_location_str = f"{data['takeoff_location']['x']}, {data['takeoff_location']['y']}"
-#             landing_location_str = f"{data['landing_location']['x']}, {data['landing_location']['y']}"
-
-#             record = FlightRecord(
-#                 date=data['date'],
-#                 pilot=data['pilot'],
-#                 takeoff_time=data['takeoff_time'],
-#                 landing_time=data['landing_time'],
-#                 summary=data['summary'],
-#                 takeoff_location=takeoff_location_str,
-#                 landing_location=landing_location_str,
-#             )
-#             record.save()
-#             return JsonResponse({'success': True})
-#         except Exception as e:
-#             print("Error while saving record:", e)
-#             return JsonResponse({'success': False, 'error': str(e)})
-
-#     return JsonResponse({'success': False, 'error': 'Invalid request'})
-
+            print(str(e))
+            traceback.print_exc()
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return HttpResponseBadRequest('Invalid method')
+        
 def export_data_to_excel(request):
     absolute_path = '/Users/yoshiayu/drone_project/static/飛行日誌.xlsx'
     # file_path = '飛行日誌.xlsx'
@@ -243,21 +198,6 @@ def new_flight(request):
         form = FlightForm()
         return render(request, 'new_flight.html', {'form': form})
 
-# def new_flight(request):
-#     if request.method == 'POST':
-#         form = FlightForm(request.POST)
-#         if form.is_valid():
-#             flight = form.save()
-#             flight.takeoff_time = timezone.now()
-#             flight.save()
-#             return redirect('flight_detail', flight_id=flight.id)
-#         else:
-#             messages.error(request, "データの保存に失敗しました。入力内容を再度確認してください。")
-#             return render(request, 'new_flight.html', {'form': form})
-#     else:
-#         form = FlightForm()
-#         return render(request, 'new_flight.html', {'form': form})
-
 def import_data_from_excel(request):
     file_path = '飛行日誌.xlsx'
     data = pd.read_excel(file_path, engine='openpyxl')
@@ -281,17 +221,3 @@ def get_excel_file(request):
     else:
         # ファイルが存在しない場合の処理
         return JsonResponse({"success": False, "error": "File not found"})
-
-# def new_flight(request):
-#     if request.method == 'POST':
-#         form = FlightForm(request.POST)
-#         if form.is_valid():
-#             flight = form.save()
-#             flight.takeoff_time = timezone.now()
-#             flight.save()
-#             return redirect('flight_detail', flight_id=flight.id)
-#         else:
-#             return render(request, 'new_flight.html', {'form': form, 'errors': form.errors})
-#     else:
-#         form = FlightForm()
-#         return render(request, 'new_flight.html', {'form': form})

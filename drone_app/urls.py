@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import maintenance_record
+# from .views import SaveMaintenanceRecordView
 
 urlpatterns = [
     path('new_flight/', views.new_flight, name='new_flight'),
@@ -13,6 +13,5 @@ urlpatterns = [
     path('flight-summaries/', views.flight_summaries, name='flight_summaries'),
     # path('export_data_to_excel/', views.export_data_to_excel, name='export_data_to_excel'),
     path('get_excel/', views.get_excel_file, name='get_excel_file'),
-    path('save_maintenance_record/', views.save_maintenance_record, name='save_maintenance_record'),
-
+    # path('save_maintenance_record/', SaveMaintenanceRecordView.as_view(), name='save_maintenance_record'),
 ]
