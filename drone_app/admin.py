@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Flight, FlightRecord
+from .models import Flight, FlightRecord, MaintenanceRecord
 
 @admin.register(Flight)
 class FlightAdmin(admin.ModelAdmin):
@@ -16,3 +16,7 @@ class FlightAdmin(admin.ModelAdmin):
         'takeoff_location_lat', 'takeoff_location_lng',
         'landing_location_lat', 'landing_location_lng'
     ]
+
+@admin.register(MaintenanceRecord)
+class MaintenanceRecordAdmin(admin.ModelAdmin):
+    list_display = ['inspection_item', 'inspection_content', 'result', 'remarks', 'location', 'date', 'inspector']

@@ -62,7 +62,6 @@ function updateFlightTimer() {
     document.getElementById('flight-time').textContent = `${hours}:${min}:${sec}`;
 }
 
-
 // タイマーをストップする関数
 function stopFlightTimer() {
     clearInterval(flightTimer);
@@ -149,8 +148,7 @@ function saveRecord() {
     console.log(data);
     console.log('Takeoff:', takeoffLocationObj);
     console.log('Landing:', landingLocationObj);
-
-    
+   
     fetch('/save_record/', {
         method: 'POST',
         headers: {
@@ -181,13 +179,9 @@ function saveRecord() {
 
 // 総飛行時間を計算して表示する関数
 function updateTotalFlightTime() {
-    // 離陸時間と着陸時間から総飛行時間を計算します
-    // ここでは仮の時間データを使っています。実際の計算ロジックを実装する必要があります
-    const totalFlightTime = "00:45:30";
-    
+    const totalFlightTime = "00:45:30";  
     // 総飛行時間を表示する要素を取得
-    const totalFlightTimeElement = document.getElementById("total-flight-time");
-    
+    const totalFlightTimeElement = document.getElementById("total-flight-time");    
     // 総飛行時間を表示
     totalFlightTimeElement.textContent = totalFlightTime;
 }
@@ -211,15 +205,12 @@ function exportCSV() {
 
         // CSVデータを生成
         let csvData = "飛行年月日,操縦者,飛行概要,離陸時間,着陸時間,総飛行時間,離陸地座標,着陸地座標\n";
-        csvData += `${flightDate},${pilotName},${flightSummary},${takeoffTime},${landingTime},${totalFlightTime},${takeoffCoordinates},${landingCoordinates}\n`;
-        
+        csvData += `${flightDate},${pilotName},${flightSummary},${takeoffTime},${landingTime},${totalFlightTime},${takeoffCoordinates},${landingCoordinates}\n`;       
         // UTF-8 BOMを追加
         const BOM = "\uFEFF";
         csvData = BOM + csvData; 
-
         // CSVデータをBlobオブジェクトとして保存
         const blob = new Blob([csvData], { type: "text/csv" });
-
         // Blobオブジェクトをダウンロードリンクとして提供
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -234,103 +225,107 @@ function exportCSV() {
         console.error("Error exporting CSV:", error);
     }
 }
-
 // イベントリスナーの設定
 document.getElementById("export-csv").addEventListener("click", exportCSV);
 
-
 function initMap() {
+    console.log('initMap function is called');
+    let takeoffMarker = null;
+    let landingMarker = null;
+    
     if (window.map) {
         google.maps.event.clearInstanceListeners(window.map);
     }    
-    // 東京の緯度と経度に設定
     var centerCoordinates = { lat: 35.6895, lng: 139.6917 };
     var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 10,  // ズームレベルを10に設定（好みに応じて調整可能）
+        zoom: 10,
         center: centerCoordinates
     });
-
-    // マーカーを作成します。
+    
+    updateLocationName(35.6895, 139.6917, 'takeoff-location-name'); // Tokyo
     const marker = new google.maps.Marker({
-        position: centerCoordinates, // マーカーの初期位置も東京に設定
+        position: centerCoordinates,
         map: map,
-        draggable: true // このオプションを設定すると、マーカーをドラッグできます
+        draggable: true
     });
 
-    // マーカーにクリックイベントを追加します。
-    marker.addListener('click', function() {
-        const pos = marker.getPosition();
-        alert('マーカーの位置: ' + pos.lat() + ', ' + pos.lng());
-    });
+    function updateLocationName(lat, lng, elementId) {
+        console.log(`updateLocationName called with lat: ${lat}, lng: ${lng}, elementId: ${elementId}`);
+        console.log('updateLocationName is called'); // この行を追加
+        const geocoder = new google.maps.Geocoder;
+        const latlng = {lat: lat, lng: lng};
+        
+        geocoder.geocode({'location': latlng}, function(results, status) {
+            console.log("Geocode callback executed with status: ", status);
+            console.log('geocoder.geocode is called');
+            console.log(results);
+            if (status === 'OK') {
+                if (results[0]) {
+                    console.log('地名が見つかりました: ' + results[0].formatted_address); // この行を追加
+                    document.getElementById(elementId).textContent = results[0].formatted_address;
+                } else {
+                    console.error('No results found');
+                }
+            } else {
+                console.error('Geocoder failed due to: ' + status);
+            }
+        });
+    }    
 
-    // マーカーのドラッグイベントを追加します。
+    function attachMarkerListeners(marker, type, elementId) {
+        console.log('attachMarkerListeners is called for ' + type); // ここでログを出力
+        marker.addListener('dragend', function() {
+            console.log(type + ' marker dragged'); 
+            const pos = marker.getPosition();
+            updateCoordinates(type, pos);
+            updateLocationName(pos.lat(), pos.lng(), elementId);
+        });
+    }   
+
+    function updateCoordinates(type, location) {
+        document.getElementById(`${type}-coordinates`).textContent = '緯度: ' + location.lat() + ', 経度: ' + location.lng();
+    }
+
+    attachMarkerListeners(marker, 'takeoff', 'takeoff-location-name');
+    console.log('attachMarkerListeners called for takeoff'); // この行を追加
     marker.addListener('dragend', function() {
         const pos = marker.getPosition();
-        document.getElementById("takeoff-coordinates").textContent = '緯度: ' + pos.lat() + ', 経度: ' + pos.lng();
+        localStorage.setItem('takeoff_coordinates', '緯度: ' + pos.lat() + ', 経度: ' + pos.lng());
     });
 
-    // マップがクリックされた時のイベント
     map.addListener('click', function(event) {
         placeMarker(event.latLng, map);
     });
+
     function placeMarker(location, map) {
+        let newMarker;
+        let type;
+        let elementId;
         if (!takeoffMarker) {
+            type = 'takeoff';
+            elementId = 'takeoff-location-name';
             takeoffMarker = new google.maps.Marker({
                 position: location,
                 map: map,
                 draggable: true
             });
-            updateCoordinates('takeoff', location);
-            attachMarkerListeners(takeoffMarker, 'takeoff');
+            newMarker = takeoffMarker;
         } else if (!landingMarker) {
+            type = 'landing';
+            elementId = 'landing-location-name';
             landingMarker = new google.maps.Marker({
                 position: location,
                 map: map,
                 draggable: true
             });
-            updateCoordinates('landing', location);
-            attachMarkerListeners(landingMarker, 'landing');
+            newMarker = landingMarker;
         }
-    }
-    
-    function attachMarkerListeners(marker, type) {
-        // マーカーがドラッグされた際に座標を更新
-        marker.addListener('dragend', function() {
-            updateCoordinates(type, marker.getPosition());
-        });
-    }
-    marker.addListener('dragend', function() {
-        const pos = marker.getPosition();
-        document.getElementById("takeoff-coordinates").textContent = '緯度: ' + pos.lat() + ', 経度: ' + pos.lng();
-    
-        // ローカルストレージに離陸座標を保存
-        localStorage.setItem('takeoff_coordinates', '緯度: ' + pos.lat() + ', 経度: ' + pos.lng());
-    });
-    
-    function attachMarkerListeners(marker, type) {
-        // マーカーがドラッグされた際に座標を更新
-        marker.addListener('dragend', function() {
-            updateCoordinates(type, marker.getPosition());
-    
-            // ローカルストレージに座標を保存
-            localStorage.setItem(`${type}_coordinates`, '緯度: ' + marker.getPosition().lat() + ', 経度: ' + marker.getPosition().lng());
-        });
-    }
-//     // マーカーのドラッグイベントの後に追加
-//     marker.addListener('dragend', function() {
-//         const pos = marker.getPosition();
-//         document.getElementById("takeoff-coordinates").textContent = '緯度: ' + pos.lat() + ', 経度: ' + pos.lng();
-
-//     // ローカルストレージに離陸座標を保存
-//     localStorage.setItem('takeoff_coordinates', '緯度: ' + pos.lat() + ', 経度: ' + pos.lng());
-// });
-    
-    function updateCoordinates(type, location) {
-    // 指定されたタイプの座標を更新
-        document.getElementById(`${type}-coordinates`).textContent = '緯度: ' + location.lat() + ', 経度: ' + location.lng();
-        console.log(`${type} updated to: 緯度: ${location.lat()}, 経度: ${location.lng()}`);
-    }
-
+        if (newMarker) {
+            console.log('attachMarkerListeners is going to be called for ' + type); // ここでログを出力
+            updateCoordinates(type, location);
+            attachMarkerListeners(newMarker, type, elementId);
+        }
+    }    
 }
 
 function appendDataToExcel(fileInput) {
