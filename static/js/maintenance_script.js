@@ -158,7 +158,7 @@ function saveToServer(formattedData) {
     })
     .then(json => {
         if (json.status === 'success') {
-            document.getElementById('message').textContent = 'Maintenance record saved successfully';
+            document.getElementById('message').textContent = '正常に保存されました。';
         } else {
             document.getElementById('message').textContent = 'There was an error while saving the maintenance record. Please try again.';
         }

@@ -165,7 +165,7 @@ function saveRecord() {
     })
     .then(json => {
         if (json.success) {
-            document.getElementById('message').textContent = 'Record saved successfully';
+            document.getElementById('message').textContent = '正常に保存されました。';
         } else {
             document.getElementById('message').textContent = 'Error: ' + json.error;
         }
@@ -241,6 +241,7 @@ function initMap() {
         zoom: 10,
         center: centerCoordinates
     });
+    
     updateLocationName(35.6895, 139.6917, 'takeoff-location-name'); // Tokyo
     const marker = new google.maps.Marker({
         position: centerCoordinates,
@@ -256,6 +257,7 @@ function initMap() {
         
         geocoder.geocode({'location': latlng}, function(results, status) {
             console.log("Geocode callback executed with status: ", status);
+            console.log('geocoder.geocode is called');
             console.log(results);
             if (status === 'OK') {
                 if (results[0]) {
@@ -345,8 +347,10 @@ function appendDataToExcel(fileInput) {
                 document.getElementById("takeoff-time").value,
                 document.getElementById("landing-time").value,
                 document.getElementById("total-flight-time").textContent,
-                document.getElementById("takeoff-coordinates").textContent,
-                document.getElementById("landing-coordinates").textContent
+                document.getElementById("takeoff-location-name").textContent, // 離陸地の地名
+                document.getElementById("landing-location-name").textContent // 着陸地の地名
+                // document.getElementById("takeoff-coordinates").textContent,
+                // document.getElementById("landing-coordinates").textContent
             ]
         ];
 
@@ -397,6 +401,8 @@ document.getElementById('export-excel').addEventListener('click', function(e) {
         // const workbook = XLSX.read(data, {type: "array"});
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         // 既存のセルの列の幅を保持
+        const 離陸地名 = document.getElementById("takeoff-location-name").textContent;
+        const 着陸地名 = document.getElementById("landing-location-name").textContent;
         const originalCols = worksheet['!cols'];
         const updateCell = (r, c, value) => {
             const originalCell = worksheet[XLSX.utils.encode_cell({r: r, c: c})];
@@ -405,8 +411,10 @@ document.getElementById('export-excel').addEventListener('click', function(e) {
         updateCell(5, 1, 飛行年月日);
         updateCell(5, 2, 操縦者);
         updateCell(5, 3, 飛行概要);
-        updateCell(5, 4, 離陸座標);
-        updateCell(5, 5, 着陸座標);
+        updateCell(5, 4, 離陸地名); // 離陸地の地名
+        updateCell(5, 5, 着陸地名); // 着陸地の地名
+        // updateCell(5, 4, 離陸座標);
+        // updateCell(5, 5, 着陸座標);
         updateCell(5, 6, 離陸時刻);
         updateCell(5, 7, 着陸時刻);
         updateCell(5, 9, 総飛行時間);
